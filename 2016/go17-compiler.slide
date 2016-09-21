@@ -1,0 +1,262 @@
+Utilizing the Go 1.7 SSA Compiler
+
+Copenhagen Gophers Meetup
+20 Sep 2016
+
+Klaus Post
+Vivino, Senior Backend Engineer
+klauspost@gmail.com
+
+
+* Go SSA Compiler
+
+Main feature of the compiler in Go 1.7 is a "Static Single Assignment" compiler.
+
+Used by some of our favorite tools:
+
+- go vet
+- gorename
+- Go Guru (former Go Oracle)
+- safesql
+
+NOW: 
+
+- go build
+
+* What does SSA do?
+
+(stolen from: [[https://talks.golang.org/2014/static-analysis.slide#10][Static analysis tools talks]] by Alan Donovan)
+
+Extremely simplified:
+
+Programs are lowered into Static Single-Assignment form (SSA):
+
+- simplifies dataflow analyses since _reaching_ _definitions_ are implicit
+- invented 1991, now mainstream (gcc, llvm)
+
+All Go programs can be expressed using only ~30 basic instructions
+
+Simple, explicit, high-level, high source fidelity
+
+.link http://godoc.org/golang.org/x/tools/go/ssa golang.org/x/tools/go/ssa
+
+
+* SSA Example
+
+	func fib(x int) int {
+		if x < 2 {
+			return x
+		}
+		return fib(x-1) + fib(x-2)
+	} 
+
+↓
+
+	func fib(x int) int:
+	0:                                                                entry P:0 S:2
+	        t0 = x < 2:int                                                     bool
+	        if t0 goto 1 else 2
+	1:                                                              if.then P:1 S:0
+	        return x
+	2:                                                              if.done P:1 S:0
+	        t1 = x - 1:int                                                      int
+	        t2 = fib(t1)                                                        int
+	        t3 = x - 2:int                                                      int
+	        t4 = fib(t3)                                                        int
+	        t5 = t2 + t4                                                        int
+	        return t5
+
+* More Information on SSA
+
+Go Static Analysis Tools by Alan Donovan
+
+.image go17-compiler/donovan-talk.png
+
+.link http://vimeo.com/114736889 Watch the talk on Vimeo
+
+.link https://talks.golang.org/2014/static-analysis.slide#1 Slides
+
+* What does it mean?
+
+- Better code generation
+- Easy optimizations
+- Cross platform optimizations
+
+= Faster Go programs. AMD64 for now, others already shaping up.
+
+.image go17-compiler/pixel-gopher-256.png
+
+* SSA "rules"
+
+SSA rules allows to specify optimizations in a relatively simple syntax which is converted into code.
+
+Example: "b = a * -1"
+
+	// Convert x * -1 to -x. The front-end catches some but not all of these.
+	(Mul8  (Const8  [-1]) x) -> (Neg8  x)
+	(Mul16 (Const16 [-1]) x) -> (Neg16 x)
+
+.link https://github.com/golang/go/blob/master/src/cmd/compile/internal/ssa/rewritegeneric.go#L5760 Generated Code
+
+.link https://github.com/golang/go/tree/master/src/cmd/compile/internal/ssa/gen Current SSA Rewrite Rules
+
+* Bound Check Elimination
+
+GC and Bounds Checks are the reason for most of the performance difference between C and Go.
+
+SSA only helps GC to a smaller degree through "escape analysis".
+
+However, SSA helps eliminating bounds checks, by having an easier path for tracing values.
+
+Go 1.7 is now eliminating way more bounds checks, since it is easier to analyze program flow.
+
+* Bounds Check Elimination Example
+
+
+Simple, by type:
+
+	var a [256]int
+
+	// byte can never be > 255
+	for i := 0; i < 50000; i++ {
+		_ = a[byte(i)]
+	}
+
+
+By masking lookup:
+
+	var b [4096]int
+
+	// Mask 11 lower bits
+	for i := 0; i < 50000; i++ {
+		_ = b[i&4095]
+	}
+
+
+
+* Bounds Check Elimination Example
+
+What about slices and not arrays?
+
+Help the compiler!
+
+Example from compress/flate:
+
+	// matchLen returns the number of matching bytes in a and b
+	// up to length 'max'. Both slices must be at least 'max'
+	// bytes in size.
+	func matchLen(a, b []byte, max int) int {
+		a = a[:max]
+		b = b[:len(a)]
+		for i, av := range a {
+			if b[i] != av {
+				return i
+			}
+		}
+		return max
+	} 
+
+* Identifying Bounds Checks
+
+.code go17-compiler/bounds.go
+
+* Make the compiler tell us
+
+.code go17-compiler/bounds_hl.go
+
+	$ go build -gcflags="-d=ssa/check_bce/debug=1" bounds.go
+	# command-line-arguments
+	.\bounds.go:7: Found IsInBounds
+
+Signifies one or more bounds check in the loop.
+
+* Let's fix it
+
+.code go17-compiler/bounds_fix.go
+
+	$ go build -gcflags="-d=ssa/check_bce/debug=1" bounds.go
+	# command-line-arguments
+	.\bounds.go:5: Found IsSliceInBounds
+	.\bounds.go:8: Found IsInBounds
+
+Hmmm... Have we just made it worse?
+
+Guess Go isn't perfect (yet).
+
+* Let's fix it (again)
+
+.code go17-compiler/bounds_fixed.go
+
+	$ go build -gcflags="-d=ssa/check_bce/debug=1" bounds.go
+	# command-line-arguments
+	.\bounds.go:5: Found IsSliceInBounds
+	.\bounds.go:7: Found IsSliceInBounds
+
+Success - we now only check bounds outside the loop.
+
+
+* Real world performance
+
+From [[https://github.com/klauspost/dedup][dedup package]]:
+
+	var c1 byte      // last byte
+	var h  uint32    // rolling hash for finding fragment boundaries
+	var o1 [256]byte // Order 1 prediction table
+
+	// Split b based on order 1 predictions.
+	func Split(b []byte) int
+		for i, c := range b {
+			if c == o1[c1] {
+				h = (h + uint32(c) + 1) * 314159265
+			} else {
+				h = (h + uint32(c) + 1) * 271828182
+			}
+			o1[c1] = c
+			c1 = c
+			if condition { return i }
+		}
+	}
+
+* Numbers
+
+https://github.com/klauspost/dedup
+
+	$ go test -bench=DynamicFragments
+
+Go 1.6.3:
+
+	BenchmarkDynamicFragments64K-8                20          59823050 ns/op         175.28 MB/s
+
+Go 1.7.1:
+
+	BenchmarkDynamicFragments64K-8                30          37100610 ns/op         282.63 MB/s
+
+* "Mind == Blown" bonus
+
+
+	y := x[1]
+	z := x[0]
+
+faster than 
+
+	y := x[0]
+	z := x[1]
+
+.image go17-compiler/brad-gopher.jpg 
+.caption Brad Fitzpatrick: [[https://twitter.com/bradfitz/status/335213285815226369][Evil, possessed gopher]].
+
+* Conclusion
+
+- Help the compiler in time critical loops
+- Enjoy the free speedups
+- Check and Benchmark your code
+
+.image go17-compiler/pixel-gopher-256.png
+
+* Questions
+
+.image go17-compiler/questions.png
+
+Feel free to ask questions, or ask later.
+
+
