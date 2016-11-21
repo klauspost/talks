@@ -1,0 +1,188 @@
+Deflate and You
+
+Copenhagen Gophers Meetup
+15 Nov 2016
+
+Klaus Post
+Vivino, Senior Backend Engineer
+klauspost@gmail.com
+
+* Deflate, Inflate
+
+A streaming format flat compresses byte streams.
+
+Created by Phil Katz as part of PKZIP, with format specification released in the 90's.
+
+Used for data compression in popular file formats such as:
+
+- zip
+- gzip
+- png
+
+From the beginning it has always been the "good enough" option, never beeing the best nor the fastest.
+
+Now it has very strong cross-platform and cross-language support.
+
+.background deflate/nov2016.meetup-vivino.png
+
+* streaming format
+
+Contains blocks of data which can be:
+
+- Uncompressed data, 0-65535 bytes.
+- LZ77 + static Huffman compressed block.
+- LZ77 + dynamic Huffman compressed block.
+
+Each block can signify that it is the last block in the stream.
+
+Offers adjustable compression to trade of processing time for a small compression penalty.
+
+
+* Huffman Compression
+
+.image deflate/huffman_encoding_small.png
+.caption Huffman encoding. Remixed from “mason jennings:living in the moment” by Lali Masriera.
+
+- 255 literal values
+- 1 "End of Block" code
+- 29 match codes
+
+* LZ77 Encoding
+
+Described by Abraham Lempel and Jacob Ziv in 1977. LZ77 is still popular today, variations are used in Snappy, LZ4, Brotli and many more.
+
+Deflate defines 2 output types:
+
+- Output single byte with value.
+- Go back X bytes, copy Y bytes to output.
+
+For deflate X: 1 ⇒ 32768, Y: 3 ⇒ 258.
+
+Variation like "go back one and copy 20 bytes" is allowed (duplicated the last byte 20 times).
+
+* Why bother?
+
+- deflate is widely used by gzip which is the most used HTTP compression.
+- deflate is widely used for protocol compression.
+- gzip is widely used for file distribution.
+
+In general, deflate still offers a good CPU to size performance.
+
+* Back to Go
+
+Triggered by improvements to zlib that Cloudflare published, which added:
+
+- Faster hashing for match identification
+- Don't make 3 byte matches - often takes more space than 3 literal bytes.
+- Optimized CRC32 (for gzip).
+- Assembler functions for window rolling and match length determination.
+
+I wanted to see if any of these could be applied to the Go version.
+
+* Initial Observations
+
+Go version was considerably slower than zlib using cgo.
+
+Go versions made a lot of allocations - even when reusing the encoder.
+
+Go matching was one complex function with much branching.
+
+Go version offered rather small improvements for big speed decrease on higher levels.
+
+Uncompressible content was very slow.
+
+CRC32 was pure Go.
+
+Go implementation was solid, but hadn't been worked on significantly since Go 1.
+
+* Improvements in Go 1.7
+
+- Do 4 byte matches only
+- Using the "Snappy" code, create a much faster "Best Speed".
+- Improved hashing algorithm.
+- Remove allocations in Huffman encoder.
+- Add a "Huffman Only" mode for pure entropy reduction.
+- Add AMD64 CRC32 calculation (gzip).
+
+"Best Speed" 2-3x faster, other levels typically 2x faster than 1.6. 
+"Best Speed" supports fast skipping of precompressed input.
+
+Bonus in Go 1.8: Improved compression in "Best Speed".
+
+
+* How to benefit?
+
+- Upgrade to Go 1.7
+- Use `Reset()` function to avoid re-initializing everything!
+
+Web Content (Best Speed), Without Reset:
+
+	28.67 MB/s
+
+Web Content (Best Speed), With Reset:
+
+	73.09 MB/s
+
+- Fine tune compression level to your needs.
+- Use `"github.com/klauspost/compress"` package for newest features.
+- Use `"github.com/klauspost/pgzip"` for parallel gzip compression.
+
+* Improvements in "klauspost/compress"
+
+- Fast "skipping" on all compression levels if uncompressible.
+- Level 2-4 are much faster, based of Snappy.
+.image go17-compiler/pixel-gopher-256.png
+- "Default" compression level typically 2x faster at small compression loss.
+- Much better balance between speed/size per level.
+
+* Speed/Size tradeoff - Go 1.7 (enwik9)
+
+.image deflate/speed-size-go17.png
+
+* Speed/Size tradeoff - KP (enwik9)
+
+.image deflate/speed-size-kp.png
+
+* WIP improvements
+
+There are plenty of good tools to improve static file compression, so focus remains mainly on speed.
+
+.link https://github.com/klauspost/compress/pull/60 PR #60 Re-using dynamic encoding tables
+Typical 20% speed increase, with small compression loss.
+
+.link https://github.com/klauspost/compress/pull/70 PR #70 Leaner encoder interface
+For those too lazy to use Reset().
+
+* WIP improvements 2
+
+.link https://github.com/klauspost/compress/pull/69 Create token histograms as they are added
+Typical 5% faster with no downside.
+
+.link https://github.com/klauspost/compress/pull/68 Bigger blocks.
+Typically 5% faster with small compression loss.
+
+- Add "automatic" level based on input analysis.
+
+
+* Conclusion
+
+- Use `Reset()` when compressing small payloads.
+- Choose your compression level wisely.
+- Only use "Best Compression" for static content. 
+- See Zopfli, zRecompress a.o. for ultimate static content compression.
+
+Personal Lessons:
+
+- Benchmark - always - and with real life benchmarks.
+- Changing code that has been mostly untouched for 5 years is hard.
+- You can always make things faster.
+
+.background deflate/nov2016.meetup-vivino.png
+
+* Questions
+
+.image deflate/questions-transparent.png
+
+Feel free to ask questions, or ask later.
+
+
