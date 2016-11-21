@@ -1,3 +1,7 @@
+# watch
+
+* Go to http://klauspost-talks.appspot.com/ to see these slides live.
+
 # talks
 
 This repository holds various Go talks I have made that may be viewed with the present tool.
