@@ -37,6 +37,7 @@ Each block can signify that it is the last block in the stream.
 
 Offers adjustable compression to trade of processing time for a small compression penalty.
 
+.background deflate/nov2016.meetup-vivino.png
 
 * Huffman Compression
 
@@ -60,6 +61,8 @@ For deflate X: 1 ⇒ 32768, Y: 3 ⇒ 258.
 
 Variation like "go back one and copy 20 bytes" is allowed (duplicated the last byte 20 times).
 
+.background deflate/nov2016.meetup-vivino.png
+
 * Why bother?
 
 - deflate is widely used by gzip which is the most used HTTP compression.
@@ -67,6 +70,8 @@ Variation like "go back one and copy 20 bytes" is allowed (duplicated the last b
 - gzip is widely used for file distribution.
 
 In general, deflate still offers a good CPU to size performance.
+
+.background deflate/nov2016.meetup-vivino.png
 
 * Back to Go
 
@@ -78,6 +83,8 @@ Triggered by improvements to zlib that Cloudflare published, which added:
 - Assembler functions for window rolling and match length determination.
 
 I wanted to see if any of these could be applied to the Go version.
+
+.background deflate/nov2016.meetup-vivino.png
 
 * Initial Observations
 
@@ -95,6 +102,8 @@ CRC32 was pure Go.
 
 Go implementation was solid, but hadn't been worked on significantly since Go 1.
 
+.background deflate/nov2016.meetup-vivino.png
+
 * Improvements in Go 1.7
 
 - Do 4 byte matches only
@@ -102,13 +111,14 @@ Go implementation was solid, but hadn't been worked on significantly since Go 1.
 - Improved hashing algorithm.
 - Remove allocations in Huffman encoder.
 - Add a "Huffman Only" mode for pure entropy reduction.
-- Add AMD64 CRC32 calculation (gzip).
+- Add AMD64 CRC32 calculation.
 
 "Best Speed" 2-3x faster, other levels typically 2x faster than 1.6. 
 "Best Speed" supports fast skipping of precompressed input.
 
 Bonus in Go 1.8: Improved compression in "Best Speed".
 
+.background deflate/nov2016.meetup-vivino.png
 
 * How to benefit?
 
@@ -126,6 +136,8 @@ Web Content (Best Speed), With Reset:
 - Fine tune compression level to your needs.
 - Use `"github.com/klauspost/compress"` package for newest features.
 - Use `"github.com/klauspost/pgzip"` for parallel gzip compression.
+
+.background deflate/nov2016.meetup-vivino.png
 
 * Improvements in "klauspost/compress"
 
@@ -153,6 +165,8 @@ Typical 20% speed increase, with small compression loss.
 .link https://github.com/klauspost/compress/pull/70 PR #70 Leaner encoder interface
 For those too lazy to use Reset().
 
+.background deflate/nov2016.meetup-vivino.png
+
 * WIP improvements 2
 
 .link https://github.com/klauspost/compress/pull/69 Create token histograms as they are added
@@ -163,6 +177,7 @@ Typically 5% faster with small compression loss.
 
 - Add "automatic" level based on input analysis.
 
+.background deflate/nov2016.meetup-vivino.png
 
 * Conclusion
 
@@ -182,6 +197,8 @@ Personal Lessons:
 * Questions
 
 .image deflate/questions-transparent.png
+
+.background deflate/nov2016.meetup-vivino.png
 
 Feel free to ask questions, or ask later.
 
