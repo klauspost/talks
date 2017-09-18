@@ -1,0 +1,139 @@
+Context
+
+Copenhagen Gophers Meetup
+19 Sep 2017
+
+Klaus Post
+Vivino, Senior Backend Engineer
+klauspost@gmail.com
+@sh0dan
+
+* What are plugins?
+
+Plugins are made using a special compilation mode in Go 1.8 and later.
+
+It allows at runtime to load compiled Go code and run it as part of the current process. Source code not required.
+
+.image plugins/modular_plugins.png
+.caption "House I built when I was 11" (by-nc-nd) Bricknave
+
+* Possibilities and limitations.
+
+- For now (Sept 2017) only supported on Linux.
+- Go Runtime version must match exactly.
+- Loaded plugins cannot be unloaded.
+- Runtimes are merged.
+
+.image plugins/merged.png
+.caption "Merge" (by-nd) OneFuller
+
+* When to use plugins?
+
+- Injecting code in long-running processes.
+- Map/reduce type processes (generated code, etc)
+- Avoiding recompilation of static code.
+- Due to no unload there are limitations to this, though.
+- Runtime requirements makes this harder to handle dependency-wise.
+
+* An example
+
+[[https://github.com/klauspost/cld2][CLD2 package]]. Provides language translation. Made by Google as part of the Chrome project. C++. Imported into Go via cgo.
+
+Very simple interface:
+
+	// Detect returns the language code for detected language
+	// in the given text.
+	func Detect(text string) Language
+
+	// DetectThree returns up to three language guesses.
+	func DetectThree(text string) Languages
+
+Simple fallback to returning "unknown language" if compiled without cgo.
+
+* CLD2 Part II
+
+Due to C++ and a lot of static content, compilation time was long.
+
+So to cut this down everything was put into a plugin.
+
+Build a file with a main package:
+
+	//+build linux,go1.8,cgo
+
+	package main
+
+	// #include <stdlib.h>
+	// #include "cld2.h"
+	import "C"
+
+Export the needed functions:
+
+	func Detect(text string) uint16 {}
+ 	func DetectThree(text string) info.Languages {}
+
+* CLD2 Part III
+
+	//+build linux,go1.8
+
+	//go:generate go build -buildmode=plugin -o lib/cld2go.so github.com/klauspost/cld2/internal/plugin 
+
+	var Detect func(text string) uint16
+
+	func LoadPlugin(path string) error {
+		p, err := plugin.Open(path)
+		// check err
+
+		fn, err := p.Lookup("Detect")
+		// check err
+
+		var ok bool
+		Detect, ok = f.(func(text string) uint16)
+		if !ok {
+			return fmt.Errorf("PluginDetect: wrong signature: %T", f)
+		} 
+	}
+
+
+Now we can use "Detect".
+
+* CLD2 Part IV
+
+Before using `go generate` must now be called to generate the `so` file.
+
+The user of the package must now call `LoadPlugin("path/to/cld2go.so")` before using the package.
+
+This works pretty much as expected. We are plugged in!
+
+.image plugins/plugged_in.png
+.caption "Plugged In" (by-nc) Eric Wienke
+
+* So why the ☹?
+
+- Yes, we save some linking time.
+- A lot more inconvenient to have to ship an additional file.
+- Plugin has to be compiled at least on every Go update (on CI more often though).
+- No benefit for Mac or Windows users.
+- Overall a relatively big amount of hazzle for a small gain.
+
+So not an overwhelming success.
+
+.image plugins/try_again.png
+.caption "Try Again" (by) Sean MacEntee
+
+* Conclusion
+
+- Plugins are easy to use.
+- The scope is very limited by supported platforms - no immediate plans for others.
+- Runtime requirements makes it hard to implement without strict version control.
+- Binary-only plugins does not seem feasible.
+- Most plugins will require user interaction to get running, unless distributing binaries.
+- Plugins could in the future be used for adapting/extending running code.
+
+
+* Questions
+
+.image context/questions.png
+
+Feel free to ask questions, or ask later.
+
+
