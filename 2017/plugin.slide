@@ -1,4 +1,4 @@
-Context
+Go Plugins
 
 Copenhagen Gophers Meetup
 19 Sep 2017
@@ -66,12 +66,25 @@ Build a file with a main package:
 	// #include "cld2.h"
 	import "C"
 
-Export the needed functions:
-
-	func Detect(text string) uint16 {}
- 	func DetectThree(text string) info.Languages {}
+	// We also put in a dummy main file for the compiler. 
+	func main() {
+		panic("install me as plugin")
+	}
 
 * CLD2 Part III
+
+Export the functions you want to access from the plugin:
+
+	func Detect(text string) uint16 {
+	}
+
+ 	func DetectThree(text string) info.Languages {
+ 	}
+
+
+Here is the [[https://github.com/klauspost/cld2/blob/master/internal/plugin/cld2_linux.go][actual file]].
+
+* CLD2 Part IV
 
 	//+build linux,go1.8
 
@@ -96,7 +109,7 @@ Export the needed functions:
 
 Now we can use "Detect".
 
-* CLD2 Part IV
+* CLD2 Part V
 
 Before using `go generate` must now be called to generate the `so` file.
 
