@@ -61,6 +61,20 @@ It is encouraged to use these with type safe accessor functions that hides the k
 	func ReqTime(c context.Context) time.Time
 
 
+* Creating Contexts
+
+You may be in a situation where you don't have a parent context.
+
+New:
+
+- [[https://golang.org/pkg/context/#Background][context.Background()]] provides a "clean" base.
+- [[https://golang.org/pkg/context/#TODO][context.TODO()]] is a good way of signalling when you have a function that requires context, but you don't have one.
+- testing Context ([[https://github.com/golang/go/issues/18199][not in Go 1.8]]). Provide your own helper for cancellation and logging.
+
+Provided:
+
+- [[https://golang.org/pkg/net/http/#Request.Context][http.Request]] provides a context that is cancelled when request is finished.
+
 * Usage of context information
 
 Typical usage can include:
@@ -74,6 +88,7 @@ Do not use for:
 - Passing parameters. Obscures code.
 
 See Package userip in the [[https://blog.golang.org/context][context blog post]] for another good example.
+
 
 * Cancellation
 
@@ -100,20 +115,6 @@ An important concept is that cancellation only affects children, so parents are 
 
 However, be aware of the scope of the context. You may want goroutines to live beyond the lifetime of your request.
 
-* Creating Contexts
-
-You may be in a situation where you don't have a parent context.
-
-New:
-
-- [[https://golang.org/pkg/context/#Background][context.Background()]] provides a "clean" base.
-- [[https://golang.org/pkg/context/#TODO][context.TODO()]] is a good way of signalling when you have a function that requires context, but you don't have one.
-- testing Context ([[https://github.com/golang/go/issues/18199][not in Go 1.8]]). Provide your own helper for cancellation and logging.
-
-Provided:
-
-- [[https://golang.org/pkg/net/http/#Request.Context][http.Request]] provides a context that is cancelled when request is finished.
-
 * Usage @Vivino
 
 .image context/vivino_app_icon_200.png
@@ -127,7 +128,7 @@ Provided:
 
 * contx package
 
-Some of the functions we provide
+Some of the functions we provide:
 
 .code context/contx.go
 
