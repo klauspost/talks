@@ -1,0 +1,139 @@
+Go sync.Map
+
+Copenhagen Gophers Meetup
+21 Nov 2017
+
+Klaus Post
+Vivino, Senior Backend Engineer
+klauspost@gmail.com
+@sh0dan
+
+* What is sync.Map?
+
+	// Construct new.
+	&sync.Map{}
+
+	// Store sets the value for a key.
+	Store(key, value interface{})
+
+	// Load returns the value stored in the map for a key
+	Load(key interface{}) (value interface{}, ok bool)
+
+	// LoadOrStore returns the existing value for the key if present.
+	LoadOrStore(key, value interface{}) (actual interface{}, loaded bool)
+
+	// Range calls f sequentially for each key and value present in the map.
+	Range(f func(key, value interface{}) bool)
+
+	// Delete deletes the value for a key.
+	Delete(key interface{})
+
+* Usage
+
+.play syncmap/usage.go
+
+
+* Seems familiar, like:
+
+.play syncmap/usagemap.go
+
+* Key differences
+
+- Concurrency safe by design
+- Key/values are `interface{}`
+- Value may not be copied (but a pointer may)
+
+*Design*
+
+- Fast for contending access
+- Fast if keys remain stable
+- Lockless on pure reads
+- No gains/slower in other cases
+
+* Internals
+
+A sync.Map contains two stores, a *read*-only part that can read without a lock.
+
+.image syncmap/sync-map.png
+
+All writes are written to a *dirty* map that is initialized with a copy of the readonly map.
+
+
+
+* Operation (simplified)
+
+.image syncmap/operation.png
+
+- Read, checks readonly. If found return, if not check dirty
+
+- Store, checks readonly. If key exists overwrite in readonly (atomic write), if not add to dirty map
+
+- Delete, checks readonly, sets value to `expunged`, key is omitted from next copy. Delete from dirty map
+
+
+* Promotion
+
+If too many reads needs to access the dirty map, replace readonly with dirty.
+
+.image syncmap/promotion.png
+
+- Clone entire map to new Write map
+
+- Overwrite Read map with old Write map
+
+
+* Sounds great...
+
+.image syncmap/butwhy.gif
+
+We already have `map` and `sync.RWMutex`, right?
+
+* sync.RWMutex
+
+.image syncmap/performance.png
+.caption [[https://medium.com/@deckarep/the-new-kid-in-town-gos-sync-map-de24a6bf7c2c][Benchmark by @deckarep]]
+
+`sync.RWMutex` scales badly with *many* *cores* contending for *small* lock/unlock operations.
+
+But remember most other cases `sync.RWMutex` is faster.
+
+* Usage I
+
+A `map` containing country information indexed by country code. Loaded on server startup, updated every 30 minutes.
+
+.image syncmap/globe.png
+.caption "globe" by Mike Haufe (CC-BY-NC)
+
+Could be done with an `RWMutex`, but this should perform fine and hides the locking.
+
+* Usage Example II
+
+We have a database with highscore tables. We retain tables indexed by their name. 
+
+New tables are rarely added, but read often. Content of tables change often.
+
+.image syncmap/highscore.png
+.caption "I rock ASS" by Kevin Simpson (CC-BY-SA)
+
+* Conclusion
+
+- Be sure you don't add/delete keys often before you use
+- A regular map with mutex may be enough for you
+- But when you really need it, it is an excellent addition to the standard library
+
+.image syncmap/morning-beer.gif
+.caption Cheers!
+
+*Resources*
+
+- godoc: [[https://godoc.org/sync#Map][sync.Map]]
+- In depth blog post: [[https://medium.com/@deckarep/the-new-kid-in-town-gos-sync-map-de24a6bf7c2c][The new kid in town — Go’s sync.Map]]
+- GopherCon 2017 - Lightning Talk: Bryan C Mills: [[https://youtu.be/C1EtfDnsdDs][An overview of sync.Map]]
+
+* Questions
+
+.image context/questions.png
+
+Feel free to ask questions, or ask later.
+
+
