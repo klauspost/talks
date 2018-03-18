@@ -1,7 +1,7 @@
 Finite State Entropy Encoding
 
 Copenhagen Gophers Meetup
-17 March 2018
+20 March 2018
 
 Klaus Post
 Vivino, Senior Backend Engineer
@@ -9,6 +9,8 @@ klauspost@gmail.com
 @sh0dan
 
 * Agenda
+
+.background ./fse/bg.png
 
 - What is Entropy Coding?
 - Huffman Entropy Coding
@@ -24,6 +26,8 @@ Entropy Coders is a group of compression algorithms.
 They perform an operation where they reduce a block of input *symbols* to be represented with the smallest number of bits.
 
 A *symbol* means a value in terms of entropy encoding. It *can* be a byte, but entropy encoding can operate on any value sizes.
+
+.background ./fse/bg.png
 
 * Entropy Coding
 
@@ -187,10 +191,32 @@ Wow! That was easy - can we go home now?
 
 .code ./fse/encode-loop.go /START OMIT/,/END OMIT/
 
-* FSE Encoding
+* What is the state table?
 
-OK, so we need to look more into this state table.
+The input symbols are distributed in the table according to their frequencies.
+This means that an output symbols will probably be present multiple times in the table.
+The more often it is in the input, the more often it will be in the table.
 
+The symbols and their distribution is the input for recreating the table, and this information is stored so the decoder can re-create it.
+
+Let's say we want to create a table with `A:47%,` `B:27%,` `C:20%,` `D:6%`
+
+If we want a table with 16 entries we get `A:8`, `B:4,` `C:3,` `D:1`:
+
+.image ./fse/table-example.png
+.caption Artistic representation of a table with the symbols `A,B,C,D`.
+
+* What is the state table?
+
+Each entry in the table is assigned an output symbol and a number of bits. This is the number of bits required to *get* to this symbol from any other symbol.
+
+This also means that symbols can have have a non-finite cost in terms of bits.
+In practice the cost of a symbol will often be as close as you can get to the Shannon limit within the resolution of the table.
+
+Details on the table creation will be in links later.
+
+.image ./fse/table-example.png
+.caption Artistic representation of a table with the symbols `A,B,C,D`.
 
 * Determining bits to write
 
@@ -219,20 +245,20 @@ If we output an extra bit we move further down the table.
 
 * You have a bug
 
-I see it still seems feasible, but your stuff will not work.
+This stuff will not work.
 
 It seems like you've written this up backwards.
 
 .image ./fse/backwards.jpg
 .caption Photo by [[https://commons.wikimedia.org/wiki/File:Riding_a_Horse_Backwards_1110801.jpg][Nevit Dilmen]]
 
-* FSE Encoding
+* The state paradox
 
 You might have noticed we write out bits to get from *this* ⇒ *previous* state.
 
 This means we are encoding the cost of *getting* to a specific state.
 
-However, when decoding we need to get from *previous* ⇒ *this* state. That is not possible, since we need to know what *this* is and that is what we are trying to figure out.
+However, when decoding we need to get from *previous* ⇒ *this* state. That is not possible, since we need to know what *this* is - and that is what we are trying to figure out.
 
 .image ./fse/paradox.svg 300 300
 
@@ -270,16 +296,41 @@ Diving into how the table is built is beyond what is reasonable for this talk. F
 .image ./fse/table.png
 .caption Still not an actual FSE table.
 
-* Usage of FSE
+* Go Implementation
 
+Encoding and decoding [[https://godoc.org/github.com/klauspost/compress/fse][`github.com/klauspost/compress/fse`]], compatible with zstandard.
 
+Simple interface:
 
-* Other Entropy Coders
+    func Compress(in []byte, s *Scratch) ([]byte, error)
+    func Decompress(b []byte, s *Scratch) ([]byte, error)
 
-- Arithmetic Coding: Ancestor of FSE, has similar features but is generally considered too slow for practical use.
-- Range Coding: Quite similar to Arithmetic Coding, but still considered too slow for practical use.
-- Asymmetric Numeral Systems: Recent improvement to Arithmetic Coding, making it practical to use. FSE is one of several variants of it.
-- Golomb-Rice Coding: Table-less compression where small symbol values are common. Typically used for delta-compressed data (sound, images)
+Solid performance. Compressing 100k digits of `e`, single core:
+
+    BenchmarkCompress/digits-8                  3000            498174 ns/op         200.74 MB/s
+    BenchmarkDecompress/digits-8                5000            342608 ns/op         291.89 MB/s
+
+Still not as fast as deflate (Huffman) / huff0 (experimental)
+
+    BenchmarkDeflate/digits-8                   3000            395350 ns/op         252.95 MB/s
+    BenchmarkCompress1XReuseNone/digits-8       5000            323744 ns/op         308.89 MB/s
+
+* Conclusion
+
+We now have a new high performance Entropy Coder that can outperform Huffman when:
+
+- Input has low number of unique symbols, or
+- Input has symbols with high occurrence frequency.
+
+FSE is used in [[https://github.com/facebook/zstd][zstandard]] for compressing dictionary matches and in "huff0" for compressing the Huffman tables. Supported by Facebook.
+
+.image ./fse/facebook.svg 50 50
+
+FSE is a key part of [[https://github.com/lzfse/lzfse][LZFSE]] compression developed by Apple.
+
+.image ./fse/apple.svg 50 50
+
+.background ./fse/bg.png
 
 * Questions
 
