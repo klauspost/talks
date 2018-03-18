@@ -1,22 +1,22 @@
 package main
 
 import (
-	"image"
-	"io/ioutil"
 	"bytes"
-	_ "image/png"
-	"github.com/ngaut/log"
-	"os"
-	"image/color"
-	"math"
-	"image/png"
-	"image/draw"
-	"strings"
+	"compress/flate"
 	"fmt"
 	"github.com/klauspost/compress/fse"
-	"compress/flate"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
+	_ "image/png"
+	"io/ioutil"
+	"log"
+	"math"
 	"math/rand"
+	"os"
 	"sort"
+	"strings"
 )
 
 func main() {
@@ -53,12 +53,12 @@ func writeout(img *image.Gray, name string) {
 	_, err = fw.Write(img.Pix)
 	exitOnErr(err)
 	fw.Close()
-	bits := int(0.9999+math.Log2(float64(symbols)))
+	bits := int(0.9999 + math.Log2(float64(symbols)))
 	fmt.Fprintf(out, "// In: %d, Symbols: %d, Lim: %d, FSE: %d (%.2f:1), Huff: %d (%.2f:1), %d bits: %d\n",
 		len(img.Pix), symbols, limit,
 		len(compFSE), float64(len(img.Pix))/float64(len(compFSE)),
 		compDef.Len(), float64(len(img.Pix))/float64(compDef.Len()),
-			bits, int((bits* len(img.Pix)+7)/8))
+		bits, int((bits*len(img.Pix)+7)/8))
 
 }
 
@@ -68,10 +68,10 @@ func combinedWithHist(in *image.Gray) (out *image.Gray, symbols, limit int) {
 
 	cRect := image.Rect(0, 0, 512+20, 256)
 	out = image.NewGray(cRect)
-	draw.Draw(out, cRect, image.NewUniform(color.Gray{255}), image.Pt(0,0), draw.Over)
-	draw.Draw(out, cRect, in, image.Pt(0,0), draw.Over)
-	cRect.Min.X = 256+20
-	draw.Draw(out, cRect, hist, image.Pt(0,0), draw.Over)
+	draw.Draw(out, cRect, image.NewUniform(color.Gray{255}), image.Pt(0, 0), draw.Over)
+	draw.Draw(out, cRect, in, image.Pt(0, 0), draw.Over)
+	cRect.Min.X = 256 + 20
+	draw.Draw(out, cRect, hist, image.Pt(0, 0), draw.Over)
 	return out, symbols, limit
 }
 
@@ -88,9 +88,9 @@ func histogram(in *image.Gray) (out *image.Gray, symbols, limit int) {
 
 	// Maximum for normalization.
 	shannon := float64(0)
-	total := float64(w*h)
+	total := float64(w * h)
 	max := 0
-	for i:= range hist[:] {
+	for i := range hist[:] {
 		if hist[i] > max {
 			max = hist[i]
 		}
@@ -100,20 +100,20 @@ func histogram(in *image.Gray) (out *image.Gray, symbols, limit int) {
 		}
 	}
 	out = image.NewGray(image.Rect(0, 0, 256, 256))
-	invMax := 1.0/float64(max)
-	for x:= range hist[:] {
+	invMax := 1.0 / float64(max)
+	for x := range hist[:] {
 		if hist[x] > 0 {
 			symbols++
 		}
-		height := 256*float64(hist[x])*invMax
-		height = 256-height
-		for y:=0; y < 256; y++ {
-			weight := (height-float64(y))*255
-			weight = math.Min(math.Max(weight,0), 255.5)
-			out.SetGray(x,y, color.Gray{uint8(weight)})
+		height := 256 * float64(hist[x]) * invMax
+		height = 256 - height
+		for y := 0; y < 256; y++ {
+			weight := (height - float64(y)) * 255
+			weight = math.Min(math.Max(weight, 0), 255.5)
+			out.SetGray(x, y, color.Gray{uint8(weight)})
 		}
 	}
-	return out, symbols, int(shannon+7)/8
+	return out, symbols, int(shannon+7) / 8
 }
 
 // posterize reduces the number of colors by posterizing.
@@ -123,7 +123,7 @@ func posterize(img *image.Gray, n uint8) *image.Gray {
 	for y := 0; y < grey.Rect.Dy(); y++ {
 		for x := 0; x < grey.Rect.Dx(); x++ {
 			pix := img.GrayAt(x+inRect.Min.X, y+inRect.Min.Y)
-			pix.Y -= pix.Y %n
+			pix.Y -= pix.Y % n
 			grey.Set(x, y, pix)
 		}
 	}
@@ -137,18 +137,19 @@ func contrast(img *image.Gray, n uint8) *image.Gray {
 	for y := 0; y < grey.Rect.Dy(); y++ {
 		for x := 0; x < grey.Rect.Dx(); x++ {
 			pix := img.GrayAt(x+inRect.Min.X, y+inRect.Min.Y)
-			pix.Y -= pix.Y %n
+			pix.Y -= pix.Y % n
 			grey.Set(x, y, pix)
 		}
 	}
 	return grey
 }
+
 // scramble moves around pixels. Image must be 256x256.
 func scramble(img *image.Gray) *image.Gray {
 	inRect := img.Bounds()
 	rng := rand.New(rand.NewSource(1337))
 	grey := image.NewGray(image.Rect(0, 0, inRect.Dx(), inRect.Dy()))
-	draw.Draw(grey, inRect, img, image.Pt(0,0), draw.Over)
+	draw.Draw(grey, inRect, img, image.Pt(0, 0), draw.Over)
 	for y := 0; y < grey.Rect.Dy(); y++ {
 		for x := 0; x < grey.Rect.Dx(); x++ {
 			rnd := int(rng.Uint32())
@@ -163,12 +164,11 @@ func scramble(img *image.Gray) *image.Gray {
 	return grey
 }
 
-
 // sorted orders pixels by . Image must be 256x256.
 func sorted(img *image.Gray) *image.Gray {
 	inRect := img.Bounds()
 	type histEntry struct {
-		n int
+		n   int
 		org uint8
 	}
 	var hist [256]histEntry
@@ -182,11 +182,11 @@ func sorted(img *image.Gray) *image.Gray {
 	}
 
 	// Record original position before sorting
-	for i:= range hist[:] {
-			hist[i].org = uint8(i)
+	for i := range hist[:] {
+		hist[i].org = uint8(i)
 	}
 	sort.Slice(hist[:], func(i, j int) bool {
-		a,b := hist[i], hist[j]
+		a, b := hist[i], hist[j]
 		if a.n != b.n {
 			return a.n > b.n
 		}
@@ -196,7 +196,7 @@ func sorted(img *image.Gray) *image.Gray {
 
 	// Create input -> output mapping.
 	var mapping [256]uint8
-	for i:= range hist[:] {
+	for i := range hist[:] {
 		mapping[hist[i].org] = uint8(i)
 	}
 
@@ -215,7 +215,7 @@ func sorted(img *image.Gray) *image.Gray {
 func downLeft(img *image.Gray) *image.Gray {
 	inRect := img.Bounds()
 	grey := image.NewGray(image.Rect(0, 0, inRect.Dx(), inRect.Dy()))
-	last := color.Gray{Y:0}
+	last := color.Gray{Y: 0}
 	for y := 0; y < grey.Rect.Dy(); y++ {
 		if y > 0 {
 			last = img.GrayAt(0, y-1)
@@ -247,7 +247,6 @@ func toGray(img image.Image) *image.Gray {
 
 func exitOnErr(err error) {
 	if err != nil {
-		log.Error(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
