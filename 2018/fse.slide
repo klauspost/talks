@@ -151,7 +151,7 @@ However, Huffman trees are compact and en/decoding is very fast, which is why Hu
 
 * Finite State Entropy
 
-Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by [[http://th.if.uj.edu.pl/~dudaj/][Jarek Duda]] from around 2010 and forward.
+Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by [[http://th.if.uj.edu.pl/~dudaj/][Jarek Duda]] from around 2007 and forward.
 
 .image fse/ans-paper.png
 .caption [[https://arxiv.org/abs/1311.2540][Paper on ANS encoding]]
