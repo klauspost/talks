@@ -1,0 +1,290 @@
+Finite State Entropy Encoding
+
+Copenhagen Gophers Meetup
+17 March 2018
+
+Klaus Post
+Vivino, Senior Backend Engineer
+klauspost@gmail.com
+@sh0dan
+
+* Agenda
+
+- What is Entropy Coding?
+- Huffman Entropy Coding
+- Finite State Entropy Coding
+- Go implementation and future
+
+Disclaimer: This talk will simplify some aspects to keep it rather brief.
+
+* What is Entropy Coding?
+
+Entropy Coders is a group of compression algorithms.
+
+They perform an operation where they reduce a block of input *symbols* to be represented with the smallest number of bits.
+
+A *symbol* means a value in terms of entropy encoding. It *can* be a byte, but entropy encoding can operate on any value sizes.
+
+* Entropy Coding
+
+Entropy encoders operates on blocks of input symbols and builds a histogram of the distribution of symbols.
+
+Based of this histogram, the input is typically assigned a number of bits. Entropy Coding is limited by [[https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem][Shannon's source coding theorem]].
+
+A visual example:
+
+.image fse/rp-orig.png
+.caption [[https://www.flickr.com/photos/oreillyconf/4818477029][Rob Pike on stage at OSCON 2010 in Portland Oregon]] by James Duncan Davidson.
+
+* Entropy Coding
+
+.image fse/rp-orig-hist.png
+.caption Same image with a histogram representing the image values.
+
+.code fse/rp-orig-hist.txt
+.code fse/explain.txt
+
+* Entropy Coding
+
+The main difference from Entropy Coding and other common compression algorithms is that it does not care (much) about the *order* of the input symbols.
+
+.image fse/rp-scrambled.png
+.caption Same image with pixels moved around randomly. Trust me: Same picture
+
+.code fse/rp-scrambled.txt
+
+.code fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Also Entropy Coding does not care (much) about the *values* of the symbols, only the distribution.
+
+.image fse/rp-sorted.png
+.caption Same image with pixels sorted by histogram occurrence
+
+.code fse/rp-sorted.txt
+
+.code fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+A way to increase compression is to reduce the *number* *of* *symbols*.
+
+.image fse/rp-post-4.png
+.caption Image reduced to 64 colors
+
+.code fse/rp-post-4.txt
+
+.code fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Fewer symbols = more compression.
+
+.image fse/rp-post-50.png
+.caption Image reduced to 6 colors
+
+.code fse/rp-post-50.txt
+
+.code fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Finally, the more skewed the distribution, the better compression.
+
+.image fse/rp-downleft.png
+.caption Lossless down + left delta encoded image.
+
+.code fse/rp-downleft.txt
+
+.code fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Combining that with reduction of symbol count gives us really good compression.
+
+.image fse/rp-post-32-downleft.png
+.caption Reduced to 8 colors, then down + left delta encoding.
+
+.code fse/rp-post-32-downleft.txt
+
+.code fse/rp-orig-hist.txt
+
+
+* Use of Entropy Coding
+
+We have now seen some of the characteristics of entropy coding. Since it doesn't care about order it does however not provide compression for:
+
+- Any matches previously encountered.
+- Runs of 'n' of the same value.
+
+Therefore Entropy Encoding is often used together with other compression algorithms, typically Dictionary Coders like LZ (Lempel–Ziv).
+
+Entropy Coding is typically used to compress the *output* of Dictionary Coders, eg. zlib deflate, zstandard, lzma (7zip, xz), brotli.
+
+* Huffman Entropy Coding
+
+.image fse/huffman_encoding_small.png
+.caption Huffman encoding. Remixed from “mason jennings:living in the moment” by Lali Masriera.
+
+Huffman produces an encoding tree, where the symbol probability defines its placement in the output tree.
+
+* Huffman Entropy Coding
+
+Huffman trees cannot represent fractional probabilities, since each symbol is represented by a finite amount of bits. If we have an input with 1000 bytes and a symbol occurs 5 times, the "optimal" distribution would be
+
+    log2(1000/5) = 7.64 bits
+
+In a Huffman tree we would typically assign 8 bits to this symbol. This is however countered by the fact that some symbols will take less bits to represent, so we end up with only a small loss.
+
+The main downside is that since we need at least 1 bit to represent a symbol this leads to a theoretical maximum of 8:1 compression when encoding bytes.
+
+However, Huffman trees are compact and en/decoding is very fast, which is why Huffman has been preferred for a long time.
+
+* Introducing Finite State Entropy
+
+.image fse/new.jpg
+
+* Finite State Entropy
+
+Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by Jarek Duda in the 2000's.
+
+.image fse/ans-paper.png
+.caption [[https://arxiv.org/abs/1311.2540][Paper on ANS encoding]]
+
+ANS is itself an improvement of Arithmetic Coding developed in the 1970s mostly by IBM, but which has mostly been considered too slow for practical use.
+
+* Finite State Entropy
+
+Arithmetic Coding and its siblings is capable of breaking the "minimum 1 bit per symbol" limit.
+
+This may seem "magical" at first, but
+
+I will use the method in FSE to describe this.
+
+* Finite State Entropy
+
+FSE is based on a state table.
+
+The size of the table is a variable power of two and the current state is simply an offset in the table.
+
+.image ./fse/table.png
+.caption Not an actual FSE table.
+
+Let's look at the decoding loop.
+
+* FSE Decoding
+
+.code ./fse/decode-loop.go
+
+* FSE Decoding
+
+Wow! That was easy - can we go home now?
+
+.image ./fse/padawan.jpg
+
+* FSE Encoding
+
+.code ./fse/encode-loop.go /START OMIT/,/END OMIT/
+
+* FSE Encoding
+
+OK, so we need to look more into this state table.
+
+
+* Determining bits to write
+
+So to break down the encoding:
+
+    nbBitsOut := (e.state + symbolTT.deltaNbBits) >> 16
+	e.writeBits(e.state, nbBitsOut)
+
+This determines the bits to write. This is determined by the *input* *symbol* and the *current* *state*.
+
+What this does is that at some point in the table, we output an extra bit.
+
+This is the cost in bits to get to the state of the next symbol.
+
+We write out the lower bits of the previous state, so we can get to it. This means we can get from this to the previous state.
+
+* Determining new state
+
+The new state is then:
+
+	dstState := (e.state>>nbBitsOut) + symbolTT.deltaFindState
+	e.state = e.table[dstState]
+
+So each symbol has an offset to reach a state where it is output.
+If we output an extra bit we move further down the table.
+
+* You have a bug
+
+I see it still seems feasible, but your stuff will not work.
+
+It seems like you've written this up backwards.
+
+.image ./fse/backwards.jpg
+.caption Photo by [[https://commons.wikimedia.org/wiki/File:Riding_a_Horse_Backwards_1110801.jpg][Nevit Dilmen]]
+
+* FSE Encoding
+
+You might have noticed we write out bits to get from *this* ⇒ *previous* state.
+
+This means we are encoding the cost of *getting* to a specific state.
+
+However, when decoding we need to get from *previous* ⇒ *this* state. That is not possible, since we need to know what *this* is and that is what we are trying to figure out.
+
+.image ./fse/paradox.svg 300 300
+
+* FIX: Encode backwards
+
+.image ./fse/backwards-flip.jpg
+
+To fix this, we encode *backwards*. The first symbol we encode is the last symbol of the output and will be the last decoded.
+
+When we are done encoding (and at the first byte of input) we store the last state in the stream and this will be where decoding starts.
+
+* Problem 2: Stalemate
+
+If there are states which reads 0 bits, will you not end up in an infinite loop?
+
+.image ./fse/stalemate.jpg
+.caption Photo by [[https://en.wikipedia.org/wiki/User:Bubba73/Images][Bubba73]]
+
+* FIX: Always be moving
+
+To fix this, we make sure the state is always changing. Depending on the table size, we define a fixed step that will always be taken, even if we do not read any bits.
+
+.image ./fse/circular.png 200 200
+
+Since we are encoding *backwards* we are encoding the cost of *getting* to a specific state and not the cost of *leaving* a specific state we can leave 0 bit states at any time.
+
+So *getting* to a state can cost 0 bits because we got there automatically, but *leaving* will always cost more. But since we cannot have more than 1 symbol with > 50% probability that will not occur.
+
+* FSE State Table
+
+So the _magic_ part is clearly building the state table so it fulfills all of the properties above - and building it fast.
+
+Diving into how the table is built is beyond what is reasonable for this talk. For those wishing to look deeper into this, there is a [[http://fastcompression.blogspot.dk/2013/12/finite-state-entropy-new-breed-of.html][series of blog posts]] by Yann Collet who designed and wrote the inital FSE implementation.
+
+.image ./fse/table.png
+.caption Still not an actual FSE table.
+
+* Usage of FSE
+
+
+
+* Other Entropy Coders
+
+- Arithmetic Coding: Ancestor of FSE, has similar features but is generally considered too slow for practical use.
+- Range Coding: Quite similar to Arithmetic Coding, but still considered too slow for practical use.
+- Asymmetric Numeral Systems: Recent improvement to Arithmetic Coding, making it practical to use. FSE is one of several variants of it.
+- Golomb-Rice Coding: Table-less compression where small symbol values are common. Typically used for delta-compressed data (sound, images)
+
+* Questions
+
+.image ./fse/questions.png
+
+Feel free to ask questions, or ask later.
+
+
