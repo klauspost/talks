@@ -1,18 +1,18 @@
 package fse
 
 // START OMIT
-// symbolTransform contains the state transform for a symbol.
-type symbolTransform struct {
-	deltaFindState int32  // delta to find state of new symbol.
-	deltaNbBits    uint32 // delta bits to output.
-}
-
 // Encoder contains information for encoding an FSE stream.
 type Encoder struct {
 	state     uint16                      // current state
 	transform []symbolTransform           // input symbol transformation
 	table     []uint16                    // encoding table
 	writeBits func(value uint16, n uint8) // write n bits to stream
+}
+
+// symbolTransform contains the state transform for a symbol.
+type symbolTransform struct {
+	deltaFindState int32  // delta to find state of new symbol.
+	deltaNbBits    uint32 // delta bits to output.
 }
 
 // Encode encodes a single byte, updates the state and writes it out.

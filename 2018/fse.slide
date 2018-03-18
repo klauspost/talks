@@ -1,4 +1,4 @@
-Finite State Entropy Encoding
+Finite State Entropy Coding
 
 Copenhagen Gophers Meetup
 20 March 2018
@@ -151,20 +151,14 @@ However, Huffman trees are compact and en/decoding is very fast, which is why Hu
 
 * Finite State Entropy
 
-Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by Jarek Duda in the 2000's.
+Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by [[http://th.if.uj.edu.pl/~dudaj/][Jarek Duda]] from around 2010 and forward.
 
 .image fse/ans-paper.png
 .caption [[https://arxiv.org/abs/1311.2540][Paper on ANS encoding]]
 
 ANS is itself an improvement of Arithmetic Coding developed in the 1970s mostly by IBM, but which has mostly been considered too slow for practical use.
 
-* Finite State Entropy
-
-Arithmetic Coding and its siblings is capable of breaking the "minimum 1 bit per symbol" limit.
-
-This may seem "magical" at first, but
-
-I will use the method in FSE to describe this.
+These algorithms allows to "break" the limitation of at least 1 bit per symbol.
 
 * Finite State Entropy
 
