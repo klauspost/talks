@@ -1,0 +1,6 @@
+In:      Input size.
+Symbols: Number of unique input symbols.
+Lim:     Shannon's source coding theoretical limit.
+FSE:     Size using FSE block. Everything included.
+Huff     Size using deflate, Huffman only.
+X bits:  Size using the least number of bits.
