@@ -21,13 +21,16 @@ Disclaimer: This talk will simplify some aspects to keep it rather brief.
 * What is Zstandard?
 
 
-Official: Zstandard - Fast real-time compression algorithm.
+Official: [[https://facebook.github.io/zstd/][Zstandard]] - Fast real-time compression algorithm.
 
 My take: Zstandard - Flexible and efficient compression format.
 
 Offers very flexible compression/speed tradeoff and a solid and well-supported implementation.
 
 Contains: Format description, C library, commandline tool `zstd`, zlib wrapper & dictionary builder.
+
+.image zstd/marketing.png _ 500
+.caption Compression Speed and Ratio from [[https://facebook.github.io/zstd/][Official Website]].
 
 * Main Advantages
 
@@ -135,6 +138,8 @@ This data is transferred to make compression better between blocks, but obviousl
 
 * Go implementation
 
+* Go implementation
+
 A cgo version exists: `github.com/DataDog/zstd`. Fast and uses the reference C implementation. Two Problems:
 
 - Not Go
@@ -142,13 +147,14 @@ A cgo version exists: `github.com/DataDog/zstd`. Fast and uses the reference C i
 
 So I decided that it was a reasonable project to create a Go version. 
 
-* Go implementation
+.image zstd/superhero.png _ 400
+.caption Gopher by [[https://github.com/egonelbre/gophers/][Egon Elbre]].
 
 * Go implementation
 
 I started by implementing FSE (Finite State Entropy) and huff0 (Huffman) encoders/decoders.
 
-I have given a talk on Finite State Entropy and Huffman coding for long-timers.
+I have given a talk on [[https://go-talks.appspot.com/github.com/klauspost/talks/2018/fse.slide#1][Finite State Entropy]] and [[https://go-talks.appspot.com/github.com/klauspost/talks/2016/deflate.slide][Huffman coding]]  for long-timers.
 
 Available as standalone packages:
 
@@ -208,7 +214,7 @@ But still BETA.
 - Convert snappy/lz4/deflate/gzip streams without re-matching, suboptimal, VERY fast
 - A simple but fast compressor
 - Implement compression similar to Zstandard
-- Improve decompression concurrency
+- Improve decompression concurrency (1.5x speed estimate)
 
 Order and timeframe is not set. Twitter or the repo is the best place for updates.
 
