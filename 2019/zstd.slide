@@ -161,6 +161,21 @@ Available as standalone packages:
 - `github.com/klauspost/compress/fse`
 - `github.com/klauspost/compress/huff0`
 
+* Go implementation thoughts
+
+- Full rewrite
+- Write based on spec (and rewrite)
+- Only sacrifice code quality for speed
+- Take the "good parts" from the C code
+
+- Except for FSE (which is a rather small part) there is nothing "new"
+- Very efficient
+- Quite few and small annoyances
+- Concurrency on streams is a pain in the #$%!!
+- Fuzz testing is *good*
+- Found one bug in the main library and several in the cgo library
+
+
 Next up: A full decompressor.
 
 * Main Goals
