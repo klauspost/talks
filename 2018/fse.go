@@ -130,20 +130,6 @@ func posterize(img *image.Gray, n uint8) *image.Gray {
 	return grey
 }
 
-// contrast reduces the number of colors by posterizing.
-func contrast(img *image.Gray, n uint8) *image.Gray {
-	inRect := img.Bounds()
-	grey := image.NewGray(image.Rect(0, 0, inRect.Dx(), inRect.Dy()))
-	for y := 0; y < grey.Rect.Dy(); y++ {
-		for x := 0; x < grey.Rect.Dx(); x++ {
-			pix := img.GrayAt(x+inRect.Min.X, y+inRect.Min.Y)
-			pix.Y -= pix.Y % n
-			grey.Set(x, y, pix)
-		}
-	}
-	return grey
-}
-
 // scramble moves around pixels. Image must be 256x256.
 func scramble(img *image.Gray) *image.Gray {
 	inRect := img.Bounds()
@@ -164,7 +150,7 @@ func scramble(img *image.Gray) *image.Gray {
 	return grey
 }
 
-// sorted orders pixels by . Image must be 256x256.
+// sorted orders pixels by frequency in histogram.
 func sorted(img *image.Gray) *image.Gray {
 	inRect := img.Bounds()
 	type histEntry struct {
@@ -203,7 +189,7 @@ func sorted(img *image.Gray) *image.Gray {
 	grey := image.NewGray(image.Rect(0, 0, inRect.Dx(), inRect.Dy()))
 	for y := 0; y < grey.Rect.Dy(); y++ {
 		for x := 0; x < grey.Rect.Dx(); x++ {
-			pix := img.GrayAt(x+inRect.Min.X, y+inRect.Min.Y)
+			pix := img.GrayAt(x, y)
 			pix.Y = mapping[pix.Y]
 			grey.Set(x, y, pix)
 		}
