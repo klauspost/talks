@@ -1,0 +1,304 @@
+Zstandard Compression
+
+Copenhagen Gophers Meetup
+30 April 2019
+
+Klaus Post
+Vivino, Backend Team Lead
+klauspost@gmail.com
+@sh0dan
+
+* Agenda
+
+.background ./zstd/bg.png
+
+- What is Zstandard?
+- Zstandard format overview
+- Go implementation and future
+- Compression Recommendation
+
+Disclaimer: This talk will simplify some aspects to keep it rather brief.
+
+* What is Zstandard?
+
+
+Official: [[https://facebook.github.io/zstd/][Zstandard]] - Fast real-time compression algorithm.
+
+My take: Zstandard - Flexible and efficient compression format.
+
+Offers very flexible compression/speed tradeoff and a solid and well-supported implementation.
+
+Contains: Format description, C library, commandline tool, zlib wrapper & dictionary builder.
+
+.image zstd/marketing.png _ 500
+.caption Compression Speed and Ratio from [[https://facebook.github.io/zstd/][Official Website]].
+
+* Main Advantages
+
+- Offers speed close to compressors without entropy encoders (Snappy/LZ4)
+- Offers compression close to best compressors (LZMA, brotli, ZPAQ)
+- Always fast decompression.
+- Open Source and well supported.
+
+The main advantage is that it offers flexibility for many use cases.
+
+.image zstd/flexible.jpg _ 500
+.caption "Lápiz Flexible" by [[https://www.flickr.com/photos/daslive/][Diego A]].
+
+* Zstandard history
+
+- Created by Yann Collet, author of LZ4 and first version v0.0.1 released January 2015.
+
+- August 31st 2016 v1.0.0 released with the final compression format. Zstd is now officially supported by Facebook.
+
+- August, 2017 Zstandard is dual-licensed under BSD and GPLv2. Shortly after GRUB adds Zstd support To Btrfs file systems.
+
+- Continous improvements. Currently at v1.4.0 with many improvements since v1.0.0
+
+* Compression Format Overview
+
+* Compression Format
+
+Official [[https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md][Specification Document]]
+
+- Stream -> Frames -> Blocks
+
+Stream is simply frames following each other.
+
+.image zstd/stream.jpg _ 600
+.caption "Stream" by [[https://www.flickr.com/photos/e7art/][e7art]].
+
+
+* Frames
+
+Frames are independent and does not depend on previous data. Frames can optionally contain uncompressed size and a 32 bit checksum hash at the end.
+
+Can contain history window size, decoding hints and a dictionary ID.
+
+The dictionary makes it possible to initialize the first block to a known state.
+
+.image zstd/frame.jpg _ 600
+.caption "frame" by [[https://www.flickr.com/photos/ansik/][Anssi Koskinen]].
+
+* Blocks
+
+Blocks can contain up to 2MB data (compressed) and may not decompress into more data than the history window size (at least 128KB).
+
+Blocks can be uncompressed data or 2 types of compressed data, either RLE or "compressed".
+
+RLE is simply the same byte repeated 'n' times. Other compressed blocks are "literals" and "sequences".
+
+.image zstd/blocks.jpg _ 400
+.caption "More blocks" by [[https://www.flickr.com/photos/hellamike81/][Mike Rastiello]].
+
+* Literals
+
+Literals are bytes that should be put on the output stream.
+
+They can optionally be Huffman compressed.
+
+.image zstd/huffman_encoding_small.png
+.caption Huffman encoding. Remixed from “mason jennings:living in the moment” by Lali Masriera.
+
+* Sequences
+
+Sequences describe how to reconstruct the output using matches from previous output and bytes from the literals section.
+
+Each sequence has:
+
+- Number of bytes to copy from literals. (0-131071 bytes)
+- Number of bytes to copy from history. (3 to 131074)
+- Offset in history to read from. (must be < history window)
+
+These values are stored on a sequence stream.
+
+* Executing sequences
+
+1) Add 'literals' to the output.
+2) Copy from history.
+3) If more left goto 1)
+
+When done, append whatever literals are left are appended.
+
+The last 3 history offsets are kept and can fairly cheaply be referenced.
+
+.image zstd/chains.jpg _ 400
+.caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
+
+* Cross block dependencies
+
+1) History Window bytes are passed between blocks.
+2) Literal block encoders can be re-used.
+3) Sequence Encoders can be re-used. State is reset though.
+4) The last 3 offsets are transferred.
+
+This data is transferred to make compression better between blocks, but obviously also limit concurrency.
+
+.image zstd/chains.jpg _ 400
+.caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
+
+* Go implementation
+
+* Go implementation
+
+A cgo version exists: `github.com/DataDog/zstd`. Fast and uses the reference C implementation. Two Problems:
+
+- Not Go
+- Has some limitations.
+
+So I decided that it was a reasonable project to create a Go version. 
+
+.image zstd/superhero.png _ 400
+.caption Gopher by [[https://github.com/egonelbre/gophers/][Egon Elbre]].
+
+* Go implementation
+
+I started by implementing FSE (Finite State Entropy) and huff0 (Huffman) encoders/decoders.
+
+I have given a talk on [[https://go-talks.appspot.com/github.com/klauspost/talks/2018/fse.slide#1][Finite State Entropy]] and [[https://go-talks.appspot.com/github.com/klauspost/talks/2016/deflate.slide][Huffman coding]]  for long-timers.
+
+Available as standalone packages:
+
+- `github.com/klauspost/compress/fse`
+- `github.com/klauspost/compress/huff0`
+
+
+Next up: A full decompressor.
+
+* Main Goals
+
+- Fast stream decoding
+- Fast small block decompression
+- Simple interface
+- Allocation-less operation
+- Concurrent decompression if faster
+
+.image zstd/lifting-1TB.svg _ 400
+.caption Gopher by [[https://github.com/egonelbre/gophers/][Egon Elbre]].
+
+* Speed
+
+Already close the the cgo implementation
+
+.code zstd/bench.txt
+
+And of course still plenty to improve
+
+.image zstd/lifting-1TB.svg _ 400
+.caption Gopher by [[https://github.com/egonelbre/gophers/][Egon Elbre]].
+
+* Interface
+
+.image zstd/api.png _ 1000
+.caption [[https://godoc.org/github.com/klauspost/compress/zstd][Full Godoc]]
+
+
+* Interface Example
+
+.code zstd/interface.go
+
+* Advanced stuff
+
+- Reuse your decoder for (largely) allocationless operation.
+- Stream is decoding concurrently ahead of time.
+- Multiple buffers can be decoded concurrently on the same decoder.
+- Fuzz tested.
+- Remember to `Close()`.
+
+Already better compatibility than cgo library.
+
+But still BETA.
+
+* Go implementation thoughts
+
+- Full rewrite
+- Write based on spec (and rewrite)
+- Only sacrifice code quality for speed
+- Take the "good parts" from the C code
+
+- Except for FSE (which is a rather small part) there is nothing "new"
+- Very efficient
+- Quite few and small annoyances
+- Concurrency on streams is a pain in the #$%!!
+- Fuzz testing is *good*
+- Found one bug in the main library and several in the cgo library
+
+* What's Next?
+
+* Compression
+
+- Convert snappy/lz4/deflate/gzip streams without re-matching, suboptimal, VERY fast
+- A simple but fast compressor
+- Implement compression similar to Zstandard
+- Improve decompression concurrency (1.5x speed estimate)
+
+Order and timeframe is not set. Twitter or the repo is the best place for updates.
+
+Looking for beta testers!
+
+.image zstd/testers.jpg _ 300
+.caption "Guinea pig Attack" by [[https://www.flickr.com/photos/bflv/][BFLV]].
+
+
+* Recommendations?
+
+Zstandard is a very good "default" choice. If you can use cgo in your project it is recommended.
+
+There may be some specialized cases where specific implementations make the most sense.
+
+Open Source and well tested is an absolute requirement.
+
+
+* Recommendations?
+
+>>> *Absolute* *Speed*
+
+- lz4
+- Snappy
+- zstd (decompress)
+
+>>> *Compatibility* 
+
+- Gzip (deflate). [[https://github.com/klauspost/pgzip][`pgzip`]] for streams.
+
+>>> *Seeking*
+
+- Snappy (requires reading stream), 
+- [[https://godoc.org/github.com/biogo/hts/bgzf][bgzf]] (deflate+index, absolute seeking).
+
+.caption Open Source and well tested is an absolute requirement.
+
+* Recommendations?
+
+>>> *Web* *Content*
+
+- Gzip 
+- Brotli (no Go compression)
+
+>>> *Integers* 
+
+- FastPFOR
+- VarInt
+- Deflate with Huffman only (bytes)
+- FSE (very low entropy or length as FSE)
+
+
+.caption Open Source and well tested is an absolute requirement.
+
+* Recommendations?
+
+*For* *everything* *else*
+
+- Zstandard (no Go compression yet)
+
+.image zstd/win.jpg _ 500
+.caption "Wine Robot" by [[https://www.flickr.com/photos/jnachman/][Jnipco]].
+
+
+* Questions
+
+.image ./zstd/questions.png
+
+Feel free to ask questions, or ask later.
+
+
