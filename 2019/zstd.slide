@@ -4,7 +4,7 @@ Copenhagen Gophers Meetup
 30 April 2019
 
 Klaus Post
-Vivino, Senior Backend Engineer
+Vivino, Backend Team Lead
 klauspost@gmail.com
 @sh0dan
 
@@ -13,8 +13,9 @@ klauspost@gmail.com
 .background ./zstd/bg.png
 
 - What is Zstandard?
-- When/how to use it
+- Zstandard format overview
 - Go implementation and future
+- Compression Recommendation
 
 Disclaimer: This talk will simplify some aspects to keep it rather brief.
 
@@ -27,7 +28,7 @@ My take: Zstandard - Flexible and efficient compression format.
 
 Offers very flexible compression/speed tradeoff and a solid and well-supported implementation.
 
-Contains: Format description, C library, commandline tool `zstd`, zlib wrapper & dictionary builder.
+Contains: Format description, C library, commandline tool, zlib wrapper & dictionary builder.
 
 .image zstd/marketing.png _ 500
 .caption Compression Speed and Ratio from [[https://facebook.github.io/zstd/][Official Website]].
@@ -46,13 +47,13 @@ The main advantage is that it offers flexibility for many use cases.
 
 * Zstandard history
 
-Created by Yann Collet, author of LZ4 and first version v0.0.1 released January 2015.
+- Created by Yann Collet, author of LZ4 and first version v0.0.1 released January 2015.
 
-August 31st 2016 v1.0.0 released with the final compression format. Zstd is now officially supported by Facebook.
+- August 31st 2016 v1.0.0 released with the final compression format. Zstd is now officially supported by Facebook.
 
-August, 2017 Zstandard is dual-licensed under BSD and GPLv2. Shortly after GRUB Picks Up Zstd Support To Handle Compressed Btrfs File-Systems.
+- August, 2017 Zstandard is dual-licensed under BSD and GPLv2. Shortly after GRUB adds Zstd support To Btrfs file systems.
 
-Continous improvements. Currently at v1.4.0 with many improvements since v1.0.0
+- Continous improvements. Currently at v1.4.0 with many improvements since v1.0.0
 
 * Compression Format Overview
 
@@ -161,20 +162,6 @@ Available as standalone packages:
 - `github.com/klauspost/compress/fse`
 - `github.com/klauspost/compress/huff0`
 
-* Go implementation thoughts
-
-- Full rewrite
-- Write based on spec (and rewrite)
-- Only sacrifice code quality for speed
-- Take the "good parts" from the C code
-
-- Except for FSE (which is a rather small part) there is nothing "new"
-- Very efficient
-- Quite few and small annoyances
-- Concurrency on streams is a pain in the #$%!!
-- Fuzz testing is *good*
-- Found one bug in the main library and several in the cgo library
-
 
 Next up: A full decompressor.
 
@@ -221,6 +208,20 @@ And of course still plenty to improve
 Already better compatibility than cgo library.
 
 But still BETA.
+
+* Go implementation thoughts
+
+- Full rewrite
+- Write based on spec (and rewrite)
+- Only sacrifice code quality for speed
+- Take the "good parts" from the C code
+
+- Except for FSE (which is a rather small part) there is nothing "new"
+- Very efficient
+- Quite few and small annoyances
+- Concurrency on streams is a pain in the #$%!!
+- Fuzz testing is *good*
+- Found one bug in the main library and several in the cgo library
 
 * What's Next?
 
