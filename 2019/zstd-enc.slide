@@ -1,0 +1,541 @@
+Zstandard Compression
+
+Copenhagen Gophers Meetup
+11 June 2019
+
+Klaus Post
+Vivino, Backend Team Lead
+klauspost@gmail.com
+@sh0dan
+
+* Agenda
+
+.background ./zstd/bg.png
+
+- Recap from last meetup
+- Encoder implementation
+- Making Go Performant
+- Compression Recommendation
+
+Disclaimer: This talk will simplify some aspects to keep it rather brief.
+
+* Compression is equal art & science
+
+.background ./zstd/bg.png
+
+
+* What is Zstandard?
+
+
+Zstandard - Flexible and efficient compression format.
+
+.image zstd/marketing.png _ 700
+.caption Compression Speed and Ratio from [[https://facebook.github.io/zstd/][Official Website]].
+
+* Compression Format
+
+Official [[https://github.com/facebook/zstd/blob/dev/doc/zstd_compression_format.md][Specification Document]]
+
+- Stream -> Frames -> Blocks
+
+Stream is simply frames following each other.
+
+.image zstd/stream.jpg _ 600
+.caption "Stream" by [[https://www.flickr.com/photos/e7art/][e7art]].
+
+* Sequences
+
+Sequences describe how to reconstruct the output using matches from previous output and bytes from the literals section.
+
+Each sequence has:
+
+- Number of bytes to copy from literals. (0-131071 bytes)
+- Number of bytes to copy from history. (3 to 131074)
+- Offset in history to read from. (must be < history window)
+
+These values are stored on a sequence stream.
+
+* Executing sequences
+
+1) Add 'literals' to the output.
+2) Copy X bytes from offset Y in recently decoded data.
+3) If more left goto 1)
+
+When done, append whatever literals are left are appended.
+
+The last 3 history offsets are kept and can fairly cheaply be referenced.
+
+.image zstd/chains.jpg _ 400
+.caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
+
+* Cross block dependencies
+
+1) "History Window" bytes are passed between blocks.
+2) Literal block encoders can be re-used.
+3) Sequence Encoders can be re-used. State is reset though.
+4) The last 3 offsets are transferred.
+
+This data is transferred to make compression better between blocks, but obviously also limit concurrency.
+
+.image zstd/chains.jpg _ 400
+.caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
+
+* Encoder implementation
+
+* Basic LZ Encoder
+
+For all bytes in input:
+
+1) Calculate Hash for next 'n'  bytes.
+2) Find position of last time we saw this hash.
+3) Check if bytes actually match. (If not, move input forward and GOTO 1)
+4) Extend match as long as possible.
+5) Store match along with queued skipped bytes.
+6) GOTO 1
+
+* Hash table
+
+In this case:
+
+	const tableBits      = 15             // Bits used in the table
+	const tableSize      = 1 << tableBits // Size of the table
+
+	// A tableEntry contains the offset and the actual value stored.
+	type tableEntry struct {
+		offset int32
+		value  uint32
+	}
+
+	table       [tableSize]tableEntry
+
+
+So hash tables are kept at quite low size to better fit in cache.
+
+In Go, we keep the value at the offset. Doubles the size, but will allow us to skip looking up the source value to check.
+
+* Hashing
+
+Is is more important that we can do fast rather than good hashing.
+
+We have hash functions for hashing 'n' bytes.
+
+Example:
+
+	const prime4bytes = 2654435761
+
+	// hash4 returns the hash of u to fit in a hash table with h bits.
+	// Preferably h should be a constant and should always be <32.
+	func hash4(u uint32, h uint8) uint32 {
+		return (u * prime4bytes) >> (32 - h)
+	}
+
+* Double Hash Table
+
+In zstd, a second hash table is also used for "standard" compression mode.
+
+There is a "long match" (8 bytes) and a "short match" (4-6 bytes) hash table.
+
+This means we can potentially find longer matches, but fall back to a short one.
+
+	for input++ < length {
+
+		if findLongMatch(input) { use that... }
+
+		if findShortMatch(intput) {
+
+			if findLongMatch(input+1) { use that... }
+			// use the short match...
+		}
+		// try next input...
+	}
+
+
+* Repeat Offsets
+
+Zstandard has a rather unique "use previous offset" mode, which is quite efficient.
+
+It allows to store a match without needing to specify the offset.
+
+	Input: <ATOMIC_WEIGHT>72</ATOMIC_WEIGHT><ATOMIC_NUMBER>32</ATOMIC_NUMBER>
+	Match: <ATOMIC_WEIGHT>98</ATOMIC_WEIGHT><ATOMIC_NUMBER>43</ATOMIC_NUMBER>
+
+Encoded as:
+
+	* Copy 15 bytes from offset X `<ATOMIC_WEIGHT>`
+	* Output 2 literal bytes `72`.
+	* Copy 31 bytes from previous offset `</ATOMIC_WEIGHT><ATOMIC_NUMBER>`
+	* Output 2 literal bytes `32`
+	* Copy 16 bytes from previous offset `</ATOMIC_NUMBER>`
+
+So 2 times we can omit storing offset X.
+
+On the fastest modes, we check the previous match offset regularly.
+
+* Back matching
+
+Since we have a rather low quality hash table, we might miss some matches.
+
+This means that when we find a match, we also try to match the bytes we skipped and extend our match backwards.
+
+This seems obvious now, but is also a trick I first saw in Zstandard.
+
+	Literals Queued: "</ERA><ATO"
+
+	Input: A><ATOMIC_WEIGHT>72</ATOMIC_WEIGHT><ATOMIC_NUMBER>32</ATOMIC_NUMBER>
+
+	Pos:        [MIC_W]  << match found here
+
+	Match: B><ATOMIC_WEIGHT>98</ATOMIC_WEIGHT><ATOMIC_NUMBER>43</ATOMIC_NUMBER>
+
+Result:
+
+	* Output `</ERA` as literals.
+	* Copy 16 bytes `><ATOMIC_WEIGHT>`.
+
+* History tracking
+
+Keep track of last X bytes.
+
+Instead of a circular buffer, we go for a simpler approach:
+
+	type state struct {
+		history []byte
+
+		// This is the offset at start of history.
+		current  int32
+	}
+
+Append new stuff to history. When we don't have space, move content down and increment current by whatever was removed.
+
+This means matches does not need to be updates/invalidated on new encodes.
+
+
+* Performance
+
+I have collected some speed examples to compare speed and compression against other compressors.
+
+	* `file` is the input file.
+	* `out` is the compressor used. `zskp` is this package. `gzstd` is gzip standard library. `zstd` is the Datadog cgo library.
+	* `level` is the compression level used. For `zskp` level 1 is "fastest", level 2 is "default".
+	* `insize`/`outsize` is the input/output size.
+	* `millis` is the number of milliseconds used for compression.
+	* `mb/s` is megabytes (2^20 bytes) per second.
+
+	The test data for the Large Text Compression Benchmark is the first
+	10^9 bytes of the English Wikipedia dump on Mar. 3, 2006.
+
+	file    out     level   insize  outsize     millis  mb/s
+	enwik9  zskp    1   1000000000  343833033   5840    163.30
+	enwik9  zskp    2   1000000000  317822183   8449    112.87
+	enwik9  gzstd   1   1000000000  382578136   13627   69.98
+	enwik9  gzstd   3   1000000000  349139651   22344   42.68
+	enwik9  zstd    1   1000000000  357416379   4838    197.12
+	enwik9  zstd    3   1000000000  313734522   7556    126.21
+
+* Performance
+
+	GOB stream of binary data. Highly compressible.
+
+	file        out level   insize      outsize     millis  mb/s
+	gob-stream  zskp    1   1911399616  234981983   5100    357.42
+	gob-stream  zskp    2   1911399616  208674003   6698    272.15
+	gob-stream  gzstd   1   1911399616  357382641   14727   123.78
+	gob-stream  gzstd   3   1911399616  327835097   17005   107.19
+	gob-stream  zstd    1   1911399616  250787165   4075    447.22
+	gob-stream  zstd    3   1911399616  208191888   5511    330.77
+
+	Highly compressible JSON file. Similar to logs in a lot of ways.
+
+	file            out level   insize      outsize     millis  mb/s
+	adresser.001    zskp    1   1073741824  18510122    1477    692.83
+	adresser.001    zskp    2   1073741824  19831697    1705    600.59
+	adresser.001    gzstd   1   1073741824  47755503    3079    332.47
+	adresser.001    gzstd   3   1073741824  40052381    3051    335.63
+	adresser.001    zstd    1   1073741824  16135896    994     1030.18
+	adresser.001    zstd    3   1073741824  17794465    905     1131.49
+
+* Performance
+
+	VM Image, Linux mint with a few installed applications:
+
+	file    out level   insize  outsize millis  mb/s
+	rawstudio-mint14.tar    zskp    1   8558382592  3648168838  33398   244.38
+	rawstudio-mint14.tar    zskp    2   8558382592  3376721436  50962   160.16
+	rawstudio-mint14.tar    gzstd   1   8558382592  3926257486  84712   96.35
+	rawstudio-mint14.tar    gzstd   3   8558382592  3740711978  176344  46.28
+	rawstudio-mint14.tar    zstd    1   8558382592  3607859742  27903   292.51
+	rawstudio-mint14.tar    zstd    3   8558382592  3341710879  46700   174.77
+
+
+	The test data is designed to test archivers in realistic backup scenarios.
+
+	file    out level   insize  outsize millis  mb/s
+	10gb.tar    zskp    1   10065157632 4883149814  45715   209.97
+	10gb.tar    zskp    2   10065157632 4638110010  60970   157.44
+	10gb.tar    gzstd   1   10065157632 5198296126  97769   98.18
+	10gb.tar    gzstd   3   10065157632 4932665487  313427  30.63
+	10gb.tar    zstd    1   10065157632 4940796535  40391   237.65
+	10gb.tar    zstd    3   10065157632 4638618579  52911   181.42
+
+* Performance
+
+	Silesia Corpus:
+
+	file    out level   insize  outsize millis  mb/s
+	silesia.tar zskp    1   211947520   73025800    1108    182.26
+	silesia.tar zskp    2   211947520   67674684    1599    126.41
+	silesia.tar gzstd   1   211947520   80007735    2515    80.37
+	silesia.tar gzstd   3   211947520   73133380    4259    47.45
+	silesia.tar zstd    1   211947520   73513991    933     216.64
+	silesia.tar zstd    3   211947520   66793301    1377    146.79
+
+
+* How do you make things FAST?
+
+* 1) Allocations
+
+These can be hard to measure directly, but they will have a great influence on your speed.
+
+Make them up front, and potentially over-allocate a bit.
+Design your code for allocationless operation. This is hard/impossible to fix later.
+Make it easy for other developers to re-use the allocated objects.
+
+	func NewWriter(w io.Writer, opts ...EOption) (*Encoder, error)
+	func (e *Encoder) Close() error
+	func (e *Encoder) Reset(w io.Writer)
+
+	// ... This function can be called concurrently...
+	func (e *Encoder) EncodeAll(src, dst []byte) []byte	
+
+
+Either allocate upfront, but it can also be on first use:
+
+	if cap(b.output) < maxCompressedBlockSize {
+		b.output = make([]byte, 0, maxCompressedBlockSize)
+	}
+	b.output = b.output[:0]
+
+* 2) Bounds checks
+
+Compression is extremely heavy on array lookups.
+
+Bounds checks are mandatory in Go. For example: 
+
+	x = y[i]
+
+adds
+
+	if i < 0 || i >= len(y) {panic}
+
+However, the Go compiler is usually clever enough to omit them if it can prove you cannot read out of bounds.
+
+
+* Masking bounds checks
+
+An AND operation is typically faster than a bounds check (branch):
+
+	const (
+		tableBits      = 15             // Bits used in the table
+		tableSize      = 1 << tableBits // Size of the table
+		tableMask      = tableSize - 1  // Mask for table indices.
+	)
+
+	// Show the compiler we have at least tableSize input.
+	table = table[:tableSize]
+
+	// bound checked
+	x := table[i]
+
+	// not bounds checked
+	x := table[i&tableMask]
+
+However, your mask and table size must be a constant so the compiler can check.
+
+* Using arrays
+
+	const (
+		tableBits      = 15             // Bits used in the table
+		tableSize      = 1 << tableBits // Size of the table
+		tableMask      = tableSize - 1  // Mask for table indices.
+	)
+
+	// The compiler always knows the sizes of arrays:
+	var table [tableSize]tableEntry
+
+	// bound checked
+	x := table[i]
+
+	// not bounds checked
+	x := table[i&tableMask]
+
+* Using smaller types
+
+	// The compiler always knows the sizes of arrays:
+	var table [256]tableEntry
+
+	// bound checked
+	x := table[i]
+
+	// not bounds checked
+	x := table[uint8(i)]
+
+	// Slices works as well
+	t := table[:256]
+
+	// Also not bounds checked
+	x := table[uint8(i)]
+
+* How to check.
+
+Use `go build -gcflags="-d=ssa/check_bce/debug=1` to check your code:
+
+	var n uint8
+	var bytes [256]uint8
+
+	// No bounds check, right?
+	dst := bytes[n:n+6]
+
+	dst[0] = byte(bits)
+	dst[1] = byte(bits >> 8)
+	dst[2] = byte(bits >> 16)
+	dst[3] = byte(bits >> 24)
+	dst[4] = byte(bits >> 32)
+	dst[5] = byte(bits >> 40)
+
+
+	.\bitwiter.go:42:12: Found IsSliceInBounds
+
+	WTF?   ..... :facepalm:
+
+* Solution
+
+Use `go build -gcflags="-d=ssa/check_bce/debug=1` to check your code:
+
+	var n uint8
+	var bytes [256]uint8
+
+	dst[n] = byte(bits)
+	dst[n+1] = byte(bits >> 8)
+	dst[n+2] = byte(bits >> 16)
+	dst[n+3] = byte(bits >> 24)
+	dst[n+4] = byte(bits >> 32)
+	dst[n+5] = byte(bits >> 40)
+
+No bounds check, and assuming you keep n <= 250 your code will work.
+
+Side note: Careful not to copy arrays or place them on the stack.
+
+* Lookups: Don't do them
+
+The best way is of course not to do them:
+
+Calculate hash of two adjacent 4 byte values:
+
+	curr := hash(load32(src, index))
+	next := hash(load32(src, index+1))
+
+Instead:
+
+	// Load 64 bits...
+	v := load64(src, index)
+	curr := hash(uint32(v))
+	next := hash(uint32(v>>8))
+
+* Tweak, check disassembly
+
+	func load64(b []byte, i int) uint64 {
+		// Help the compiler eliminate bounds checks on the read so it can be done in a single read.
+		b = b[i:]
+		b = b[:8]
+		return uint64(b[0]) | uint64(b[1])<<8 | uint64(b[2])<<16 | uint64(b[3])<<24 |
+			uint64(b[4])<<32 | uint64(b[5])<<40 | uint64(b[6])<<48 | uint64(b[7])<<56
+	}
+
+No measurable difference to (unsafe):
+
+	func load64(b []byte, i int) uint64 {
+		data := (*reflect.SliceHeader)(unsafe.Pointer(&b)).Data
+		return *(*uint64)(unsafe.Pointer(data + uintptr(i)))
+	}
+
+Guess we have *something* to thank out-of-order CPUs for.
+
+* 3) Variable Shifts
+
+It may be surprising that bit shift operations can be a bit more expensive in Go due to how x86 ISA is.
+
+	var x uint32
+	x = x >> i
+
+Transforms to:
+
+	x = x >> i  // if i >= 32 {x = 0} else {x = x >> i}
+
+Again, masks can be used to eliminate this branch:
+
+	x = x >> (i&31)
+
+Assuming you *know* that `i` will never exceed 31.
+
+* 4) Parallel processing.
+
+Yes, we "cheat" a little to reach these speeds. 
+
+Currently the encoder uses 2 goroutines, one for matching and generating sequences and one for compressing blocks.
+
+	Writer -> (full block) -> sequence generator -> (sequences) -> output generator -> writer
+
+Each only requires the previous block to be finished.
+
+This can be expanded to doing several several blocks concurrently for much better scalability.
+
+Design your program to make it reasonably easy to separate components.
+
+Benchmark to see where goroutine handover can be reasonable.
+
+
+* 5) Keep experimenting
+
+Benchmarks real world performance
+Make benchmarks you can trust
+Make it easy to experiment
+Try out "crazy" stuff
+
+
+.image zstd/lab.jpg _ 500
+.caption "_MG_5495" by [[https://www.flickr.com/photos/ibbl/][ibbl]].
+
+
+* What's Next? (Updated)
+
+- Port some stuff to deflate/gzip
+- Improve decompression concurrency (1.5x speed estimate)
+- Add stronger compression (at least 2 more levels)
+- Add dictionary support
+- Full multicore encoding
+
+Order and timeframe is not set. Twitter or the repo is the best place for updates.
+
+Beta testers always welcome <3
+
+.image zstd/testers.jpg _ 300
+.caption "Guinea pig Attack" by [[https://www.flickr.com/photos/bflv/][BFLV]].
+
+
+* Recommendation Summary
+
+Zstandard is a very good "default" choice. cgo is no longer required.
+
+There may be some specialized cases where specific implementations make the most sense.
+
+.image zstd/win.jpg _ 500
+.caption "Wine Robot" by [[https://www.flickr.com/photos/jnachman/][Jnipco]].
+
+
+* Questions
+
+.image ./zstd/questions.png
+
+Feel free to ask questions, or ask later.
+
+
