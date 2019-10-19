@@ -1,0 +1,516 @@
+Compression TLDR;
+
+MinIO
+3rd Oct 2019
+
+Klaus Post
+MinIO
+klaus@minio.io
+@sh0dan
+
+* Agenda
+
+.background ./zstd/bg.png
+
+- LZ77 coding
+- Snappy -> S2 improvements
+- Entropy coding
+- Overview of formats
+- Compression recommendation
+
+Disclaimer: This talk will simplify some aspects to keep it rather brief.
+
+
+* Compression is equal art & science. [me, 2019]
+
+
+* LZ77 coding
+
+Compression purely based on referencing previously seem data, typically with a fixed size history.
+
+The output of the LZ77 can usually be compressed further, but some formats store output as is.
+
+Snappy / LZ4 / S2 are pure LZ77 compressors with byte aligned output.
+
+Zstandard can operate in pure LZ77 mode, but with more efficient/slightly slower encoding.
+
+This is still the baseline of most popular compression formats today.
+
+* Zstandard Example
+
+Sequences describe how to reconstruct the output using matches from previous output and bytes from the literals section.
+
+Each sequence has:
+
+- Number of bytes to copy from literals. (0-131071 bytes)
+- Number of bytes to copy from history. (3 to 131074)
+- Offset in history to read from. (must be < history window)
+
+These values are stored on a sequence stream.
+
+* Executing sequences
+
+1) Add 'literals' to the output.
+2) Copy from history.
+3) If more left goto 1)
+
+When done, append whatever literals are left are appended.
+
+The last 3 history offsets are kept and can fairly cheaply be referenced.
+
+.image zstd/chains.jpg _ 400
+.caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
+
+
+* Basic LZ Encoder
+
+For all bytes in input:
+
+	1) Calculate Hash for next 4 to 8 bytes.
+	2) Find position of last time we saw this hash.
+	3) Check if bytes actually match. (If not, move input forward and GOTO 1)
+	4) Extend match as long as possible.
+	5) Store match along with queued skipped bytes.
+	6) Hash (some of the) values in the matched area.
+	7) GOTO 1
+
+Pretty much the main loop of LZ4, Snappy, S2, fast modes in deflate, zstd, etc.
+
+* Hash table
+
+In this case:
+
+	const tableBits      = 15             // Bits used in the table
+	const tableSize      = 1 << tableBits // Size of the table
+
+	// A tableEntry contains the offset and the actual value stored.
+	type tableEntry struct {
+		offset int32
+		value  uint32
+	}
+
+	table       [tableSize]tableEntry
+
+
+So hash tables are kept at quite low size to better fit in L1 cache or at least L2.
+
+In Go, we keep the value along the offset. Doubles the size, but will allow us to skip looking up the source value to check.
+
+* Hashing
+
+Is is more important that we can do fast rather than good hashing.
+
+We have hash functions for hashing 'n' bytes.
+
+Example:
+
+	const prime4bytes = 2654435761
+
+	// hash4 returns the hash of u to fit in a hash table with h bits.
+	// Preferably h should be a constant and should always be <32.
+	func hash4(u uint32, h uint8) uint32 {
+		return (u * prime4bytes) >> (32 - h)
+	}
+
+* Double Hash Table
+
+In zstd/S2 (better), a second hash table is also used for "standard" compression mode.
+
+There is a "long match" (7-8 bytes) and a "short match" (4-5 bytes) hash table.
+
+This means we can potentially find longer matches, but fall back to a short one.
+
+	for input++ < length {
+
+		if findLongMatch(input) { use that... }
+
+		if findShortMatch(input) {
+
+			if findLongMatch(input+1) { use that... }
+			// use the short match...
+		}
+		// No match found, skip to next input
+	}
+
+Add more logic to find the best matches, slower but better.
+
+* Repeat Offsets
+
+Some variants has a "use previous offset" mode, which is quite efficient.
+
+It allows to store a match without needing to specify the offset.
+
+	Input: <ATOMIC_WEIGHT>72</ATOMIC_WEIGHT><ATOMIC_NUMBER>32</ATOMIC_NUMBER>
+	Match: <ATOMIC_WEIGHT>98</ATOMIC_WEIGHT><ATOMIC_NUMBER>43</ATOMIC_NUMBER>
+
+Encoded as:
+
+	* Copy 15 bytes from offset X `<ATOMIC_WEIGHT>`
+	* Output 2 literal bytes `72`.
+	* Copy 31 bytes from previous offset `</ATOMIC_WEIGHT><ATOMIC_NUMBER>`
+	* Output 2 literal bytes `32`
+	* Copy 16 bytes from previous offset `</ATOMIC_NUMBER>`
+
+So 2 times we can omit storing offset X.
+
+On the fastest modes, we check the previous match offset regularly.
+
+Very good for machine generated data.
+
+* Backwards match search
+
+Since we have a rather low quality hash table, and may skip input, we might miss some matches.
+
+This means that when we find a match, we also try to match the bytes we skipped and extend our match backwards.
+
+This seems obvious now, but is also a trick I first saw in Zstandard.
+
+	Literals Queued: "</ERA><ATO"
+
+	Input: A><ATOMIC_WEIGHT>72</ATOMIC_WEIGHT><ATOMIC_NUMBER>32</ATOMIC_NUMBER>
+
+	Pos:        [MIC_W]  << match found here
+
+	Match: B><ATOMIC_WEIGHT>98</ATOMIC_WEIGHT><ATOMIC_NUMBER>43</ATOMIC_NUMBER>
+
+Result:
+
+	* Output `</ERA` as literals.
+	* Copy 16 bytes `><ATOMIC_WEIGHT>`.
+
+
+* Snappy -> S2 changes
+
+- Max block size 64KB -> 1MB (4MB default)
+- Add repeat matches
+- Hash longer values (4->6 bytes)
+- Add backwards match search
+- Check 2 matches + 1 repeat every 4 bytes
+- Parallel Encoding
+
+Has optional, slightly slower but with *better* compression mode:
+
+Uses a short (4 byte) and long (7 byte) match hash table.
+Tries to find a long match at position + 1 when a short match is found.
+
+
+* Entropy Coding
+
+* What is Entropy Coding?
+
+Entropy Coders is a group of compression algorithms.
+
+They perform an operation where they reduce a block of input *symbols* to be represented with the smallest number of bits.
+
+A *symbol* means a value in terms of entropy encoding. It *can* be a byte, but entropy encoding can operate on any value sizes.
+
+.background ../2018/fse/bg.png
+
+* Entropy Coding
+
+Entropy encoders operates on blocks of input symbols and builds a histogram of the distribution of symbols.
+
+Based of this histogram, the input is typically assigned a number of bits. Entropy Coding is limited by [[https://en.wikipedia.org/wiki/Shannon%27s_source_coding_theorem][Shannon's source coding theorem]].
+
+A visual example:
+
+.image ../2018/fse/rp-orig.png
+.caption [[https://www.flickr.com/photos/oreillyconf/4818477029][Rob Pike on stage at OSCON 2010 in Portland Oregon]] by James Duncan Davidson.
+
+* Entropy Coding
+
+.image ../2018/fse/rp-orig-hist.png
+.caption Same image with a histogram representing the image values.
+
+.code ../2018/fse/rp-orig-hist.txt
+.code ../2018/fse/explain.txt
+
+* Entropy Coding
+
+The main difference from Entropy Coding and other common compression algorithms is that it does not care (much) about the *order* of the input symbols.
+
+.image ../2018/fse/rp-scrambled.png
+.caption Same image with pixels moved around randomly. Trust me: Same picture
+
+.code ../2018/fse/rp-scrambled.txt
+
+.code ../2018/fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Also Entropy Coding does not care (much) about the *values* of the symbols, only the distribution.
+
+.image ../2018/fse/rp-sorted.png
+.caption Same image with pixels sorted by histogram occurrence
+
+.code ../2018/fse/rp-sorted.txt
+
+.code ../2018/fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+A way to increase compression is to reduce the *number* *of* *symbols*.
+
+.image ../2018/fse/rp-post-4.png
+.caption Image reduced to 64 colors
+
+.code ../2018/fse/rp-post-4.txt
+
+.code ../2018/fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Fewer symbols = more compression.
+
+.image ../2018/fse/rp-post-50.png
+.caption Image reduced to 6 colors
+
+.code ../2018/fse/rp-post-50.txt
+
+.code ../2018/fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Finally, the more skewed the distribution, the better compression.
+
+.image ../2018/fse/rp-downleft.png
+.caption Lossless down + left delta encoded image.
+
+.code ../2018/fse/rp-downleft.txt
+
+.code ../2018/fse/rp-orig-hist.txt
+
+* Entropy Coding
+
+Combining that with reduction of symbol count gives us really good compression.
+
+.image ../2018/fse/rp-post-32-downleft.png
+.caption Reduced to 8 colors, then down + left delta encoding.
+
+.code ../2018/fse/rp-post-32-downleft.txt
+
+.code ../2018/fse/rp-orig-hist.txt
+
+
+* Use of Entropy Coding
+
+Entropy Encoding is often used together with other compression algorithms, typically LZ.
+
+Entropy Coding is typically used to compress the *output* of Dictionary Coders, eg. zlib deflate, zstandard, lzma (7zip, xz), brotli.
+
+* Huffman Entropy Coding
+
+.image ../2018/fse/huffman_encoding_small.png
+.caption Huffman encoding. Remixed from “mason jennings:living in the moment” by Lali Masriera.
+
+Huffman produces an encoding tree, where the symbol probability defines its placement in the output tree.
+
+* Huffman Entropy Coding
+
+The main downside is that since we need at least 1 bit to represent a symbol this leads to a theoretical maximum of 8:1 compression when encoding bytes.
+
+However, Huffman trees are compact and en/decoding is pretty fast, which is why Huffman has been preferred for a long time.
+
+* Introducing Finite State Entropy
+
+.image ../2018/fse/new.jpg
+
+* Finite State Entropy
+
+Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by [[http://th.if.uj.edu.pl/~dudaj/][Jarek Duda]] from around 2007 and forward.
+
+.image ../2018/fse/ans-paper.png
+.caption [[https://arxiv.org/abs/1311.2540][Paper on ANS encoding]]
+
+ANS is itself an improvement of Arithmetic Coding developed in the 1970s mostly by IBM, but which has mostly been considered too slow for practical use.
+
+These algorithms allows to "break" the limitation of at least 1 bit per symbol.
+
+* Finite State Entropy
+
+FSE is based on a state table.
+
+The size of the table is a variable power of two and the current state is simply an offset in the table.
+
+.image ../2018/fse/table.png
+.caption Not an actual FSE table.
+
+* What is the state table?
+
+The input symbols are distributed in the table according to their frequencies.
+This means that an output symbols will probably be present multiple times in the table.
+
+The symbols and their distribution is the input for recreating the table, and this information is stored so the decoder can re-create it.
+
+Let's say we want to create a table with `A:47%,` `B:27%,` `C:20%,` `D:6%`
+
+If we want a table with 16 entries we get `A:8`, `B:4,` `C:3,` `D:1`:
+
+.image ../2018/fse/table-example.png
+.caption Artistic representation of a table with the symbols `A,B,C,D`.
+
+
+* [Skipping Details]
+
+* Go Implementation
+
+Encoding and decoding [[https://godoc.org/github.com/klauspost/compress/fse][`github.com/klauspost/compress/fse`]], compatible with zstandard.
+
+Simple interface:
+
+    func Compress(in []byte, s *Scratch) ([]byte, error)
+    func Decompress(b []byte, s *Scratch) ([]byte, error)
+
+Solid performance. Compressing 100k digits of `e`, single core:
+
+    BenchmarkCompress/digits-8                  3000            498174 ns/op         200.74 MB/s
+    BenchmarkDecompress/digits-8                5000            342608 ns/op         291.89 MB/s
+
+Still not as fast as deflate (Huffman) / huff0 (experimental)
+
+    BenchmarkDeflate/digits-8                   3000            395350 ns/op         252.95 MB/s
+    BenchmarkCompress1XReuseNone/digits-8       5000            323744 ns/op         308.89 MB/s
+
+* Other Compression Improvement Techniques
+
+There are a number of methods that can further improve compression.
+
+- Fixed shared dictionary. Effectively prepending data to input, but removing the output. Fast, but cumbersome.
+- Input Transformation. Make the content easier to compress. Usually rather slow.
+- Context Mixing. Maintain n states and have logic or a neural network decide between them. Very slow, also on decompression.
+
+
+* Compression Schemes TLDR;
+
+* LZ4/Snappy/S2
+
+These are pure LZ77 compressors with no entropy encoding meaning things like random base64 data will not be compressed.
+
+LZ4 and Snappy are pretty equivalent, with LZ4 being more flexible for better or worse.
+
+* S2
+
+Developed with high throughput as core feature.
+
+S2 is a one way backwards compatible extension of Snappy by yours truly, offering better compression, faster decompression and concurrent encoding. Only available in Go.
+
+Designed for machine generated content (repeat codes), preferring longer byte matches for faster decompression.
+
+Concurrent compression, speed typically at Snappy speed per core and better compression.
+
+Offers slightly more CPU intensive mode, still typically IO limited.
+
+
+* DEFLATE/zip/gzip/zlib
+
+All compressed content must be Huffmann encoded which limits decompression speed.
+
+The standard scheme for many, many years. 
+
+Compression can be done concurrently in blocks, but for decompression that is impossible.
+
+It is beginning to show its age, especially with low, non-parallel decompression speed.
+
+* BZ2
+
+Uses RLE, Huffman and a number of transforms.
+
+Improved compression compared to DEFLATE, but very slow and better alternatives usually exist.
+
+Do not use.
+
+* LZMA/LZMA2/xz
+
+Very efficient compression scheme, first with repeat offset codes. 
+
+LZMA2 is mostly a wrapper for LZMA to make parallel block compression possible.
+
+Uses a range coder for entropy coding, better than Huffman but slower.
+
+Generally compresses quite well, is pretty flexible, but doesn't offer really high speed variants.
+
+No good Go implementation AFAIK.
+
+
+* Brotli
+
+Developed by Google and targeted heavy at small payload HTTP compression.
+
+Seems like a DEFLATE with extensions and a dictionary optimized for web content. 
+It has a lot of features and maybe its biggest problem is the complexity.
+
+For extreme compression it uses Context Mixing, which allows for very good compression, but at very low speeds.
+This can be useful for static content.
+
+Good for static HTTP content. Not highly recommended elsewhere.
+
+A fairly new Go package is available. Pretty slow.
+
+* Zstandard
+
+Flexible and efficient compression format.
+
+Offers very flexible compression/speed tradeoff and a solid and well-supported implementation.
+
+- Offers speed close to compressors without entropy encoders (Snappy/LZ4/S2)
+- Offers compression close to best compressors (LZMA, Brotli, ZPAQ)
+- Fast decompression.
+- Open Source and well supported.
+
+
+* Recommendations?
+
+Zstandard is a very good "default" choice.
+
+There may be some specialized cases where specific implementations make the most sense.
+
+.caption Open Source and well tested is an absolute requirement.
+
+
+* Recommendations?
+
+>>> *Absolute* *Speed*
+
+- S2 (not super well tested yet)
+- LZ4 / Snappy
+- zstd (good, but slightly slower)
+
+>>> *Compatibility* 
+
+- Gzip (deflate). [[https://github.com/klauspost/pgzip][`pgzip`]] for streams.
+
+>>> *Seeking*
+
+- S2 (Very fast seek forward)
+- [[https://godoc.org/github.com/biogo/hts/bgzf][bgzf]] (deflate+index, absolute seeking).
+
+.caption Open Source and well tested is an absolute requirement.
+
+* Recommendations?
+
+>>> *Web* *Content*
+
+- Gzip 
+- Brotli
+
+>>> *Integers* 
+
+- FastPFOR
+- VarInt
+- Deflate with Huffman only
+- FSE (very low entropy or length as FSE)
+
+
+.caption Open Source and well tested is an absolute requirement.
+
+* Recommendations?
+
+*For* *everything* *else*
+
+- Zstandard
+
+.image zstd/win.jpg _ 500
+.caption "Wine Robot" by [[https://www.flickr.com/photos/jnachman/][Jnipco]].
+
+
+
