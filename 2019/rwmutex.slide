@@ -1,4 +1,4 @@
-Concurrent RW Mutex Design
+Taming Mutexes for Concurrency
 
 GoLab
 22nd October 2019
@@ -17,6 +17,16 @@ This is a "life in the trenches", not a theoretical guide.
 
 .image rwmutex/warzone.jpg 400 _ 
 .caption [[https://flic.kr/p/5AFAr9][Morning Calm...]] (cc) by-nc-nd "000815-A-3403V-102"
+
+* Further "reading"
+
+Roberto Clapis @empijei on Contention: http://clap.page.link/contention
+
+Covers everything about choosing mutexes and performance.
+
+.image rwmutex/contention.png 400 _ 
+.caption Slide from presentation.
+
 
 * The case
 
@@ -50,7 +60,7 @@ Ranked globally, Country, Region, Winery
 
 - 39M users
 
-Ranked globally, by Country, by Regional Wine Style (Tuscan Red).
+Ranked globally, by Country, by Regional Wine Style (Tuscan Red) + 2 days of history.
 
 In total about 750k rank lists. Cheers!
 
@@ -86,9 +96,12 @@ A secondary index provides lookup by element ID. It points to the score segment 
 
 * Get rank of ID
 
+Score segments: Split/Sorted by score.
+Index elements: Split/Sorted by ID.
+
 - Look up list (in memory)
 - Load list segments (on first access)
-- Load index segment with ID (if not cached)
+- Load index elements with ID (if not cached)
 - Read score segment from index element
 - Load score elements for the segment (if not cached)
 - Find element in score segment
@@ -135,6 +148,8 @@ In concept in seems simple. In reality there is complexity.
 In rare cases it can be useful to have specialized locks to facilitate timeout/deadlines or whatever you require.
 
 However, whenever you diverge from the stdlib your code gets harder to read.
+
+`sync/atomic` is in this category as well.
 
 .image rwmutex/toylock.jpg 300 _ 
 .caption [[https://flic.kr/p/9d6w8B][Toy Padlock]] (cc) by "Steve Johnson"
@@ -344,8 +359,9 @@ Create a `struct` that contains the data we deal with and information:
 
 	func (l *List) loadSegments(fl loadFlags) (*segments, error)
 
-Now almost functions access the locks anymore.
+Almost no functions access the locks anymore.
 
+Calling `unlock()` will also set `scores` and `andex` to nil and replace unlock with a function that complins about being called twice.
 
 * Sharing locked content
 
@@ -385,7 +401,7 @@ Managing the elements of single segment:
 	}
 
 	func (s *Segments) elementsAt(idx int, readOnly bool) (ls *lockedElements, err error)
-	func (s *Segments) newLockedSegment(seg *Segment) *lockedElements
+	func (s *Segments) newLockedElements(seg *Segment) *lockedElements
 	func (s *Segments) replaceSegment(ls *lockedElements) error
 
 * What does it NOT solve?
@@ -436,6 +452,22 @@ Exhaustive tests is probably not realistic, but give your tests a good chance of
 
 .image rwmutex/unlocked.jpg 300 _ 
 .caption [[https://flic.kr/p/LEhgJP][Unlocked]] (cc) by "Sergio Boscaino"
+
+* Actual Performance
+
+.image rwmutex/perf.png 200 _
+
+	- get-multi: Get element in multiple lists
+	- get-around: Get n elements by ID in single list
+	- put-multi-element: Put n elements into list
+	- put-multi-list: Put element into multiple lists.
+
+Biggest list: “vintages-global”
+
+	- 6,251,320 Elements (vintages)
+	- 4054 segments (1542 avg elements)
+	- 1,391,359,160 segments requested.
+	- 99.99907% cache hits
 
 * Conclusion
 
