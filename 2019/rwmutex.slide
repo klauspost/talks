@@ -458,7 +458,7 @@ Exhaustive tests is probably not realistic, but give your tests a good chance of
 .image rwmutex/perf.png 200 _
 
 	- get-multi: Get element in multiple lists
-	- get-around: Get n elements by ID in single list
+	- get-around: Get n ordered elements by ID in single list
 	- put-multi-element: Put n elements into list
 	- put-multi-list: Put element into multiple lists.
 
@@ -472,7 +472,7 @@ Biggest list: “vintages-global”
 * Conclusion
 
 - You *will* make mistakes in concurrent programming.
-- (Multiple) Read Write locks have tricky deadlock situations.
+- (Multiple) Read/Write locks have tricky deadlock situations.
 - Reduce complexity by wrapping your locks.
 - Have clear responsibilities.
 - Make your concurrent code testable.
