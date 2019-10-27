@@ -1,10 +1,10 @@
-Compression TLDR;
+Compression in Go
 
-MinIO
-3rd Oct 2019
+Golang Piter 2019
+1st Nov 2019
 
 Klaus Post
-MinIO
+Software Engineer, MinIO
 klaus@minio.io
 @sh0dan
 
@@ -54,9 +54,7 @@ These values are stored on a sequence stream.
 2) Copy from history.
 3) If more left goto 1)
 
-When done, append whatever literals are left are appended.
-
-The last 3 history offsets are kept and can fairly cheaply be referenced.
+When done, append whatever literals are left.
 
 .image zstd/chains.jpg _ 400
 .caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
@@ -98,7 +96,7 @@ In Go, we keep the value along the offset. Doubles the size, but will allow us t
 
 * Hashing
 
-Is is more important that we can do fast rather than good hashing.
+It is more important that we can do fast rather than good hashing.
 
 We have hash functions for hashing 'n' bytes.
 
@@ -114,7 +112,7 @@ Example:
 
 * Double Hash Table
 
-In zstd/S2 (better), a second hash table is also used for "standard" compression mode.
+In zstd/S2 (better), a second hash table is also used.
 
 There is a "long match" (7-8 bytes) and a "short match" (4-5 bytes) hash table.
 
@@ -127,7 +125,8 @@ This means we can potentially find longer matches, but fall back to a short one.
 		if findShortMatch(input) {
 
 			if findLongMatch(input+1) { use that... }
-			// use the short match...
+
+			{ use short match... }
 		}
 		// No match found, skip to next input
 	}
@@ -181,12 +180,14 @@ Result:
 
 * Snappy -> S2 changes
 
+Made for high throughput, Snappy compatible format.
+
 - Max block size 64KB -> 1MB (4MB default)
 - Add repeat matches
 - Hash longer values (4->6 bytes)
 - Add backwards match search
 - Check 2 matches + 1 repeat every 4 bytes
-- Parallel Encoding
+- Parallel Stream Encoding
 
 Has optional, slightly slower but with *better* compression mode:
 
@@ -204,7 +205,7 @@ They perform an operation where they reduce a block of input *symbols* to be rep
 
 A *symbol* means a value in terms of entropy encoding. It *can* be a byte, but entropy encoding can operate on any value sizes.
 
-.background ../2018/fse/bg.png
+.background zstd/bg.png
 
 * Entropy Coding
 
@@ -214,93 +215,86 @@ Based of this histogram, the input is typically assigned a number of bits. Entro
 
 A visual example:
 
-.image ../2018/fse/rp-orig.png
+.image compress/rp-orig.png
 .caption [[https://www.flickr.com/photos/oreillyconf/4818477029][Rob Pike on stage at OSCON 2010 in Portland Oregon]] by James Duncan Davidson.
 
 * Entropy Coding
 
-.image ../2018/fse/rp-orig-hist.png
+.image compress/rp-orig-hist.png
 .caption Same image with a histogram representing the image values.
 
-.code ../2018/fse/rp-orig-hist.txt
-.code ../2018/fse/explain.txt
+.code compress/rp-orig-hist.txt
+.code compress/explain.txt
 
 * Entropy Coding
 
 The main difference from Entropy Coding and other common compression algorithms is that it does not care (much) about the *order* of the input symbols.
 
-.image ../2018/fse/rp-scrambled.png
+.image compress/rp-scrambled.png
 .caption Same image with pixels moved around randomly. Trust me: Same picture
 
-.code ../2018/fse/rp-scrambled.txt
+.code compress/rp-scrambled.txt
 
-.code ../2018/fse/rp-orig-hist.txt
+.code compress/rp-orig-hist.txt
 
 * Entropy Coding
 
 Also Entropy Coding does not care (much) about the *values* of the symbols, only the distribution.
 
-.image ../2018/fse/rp-sorted.png
+.image compress/rp-sorted.png
 .caption Same image with pixels sorted by histogram occurrence
 
-.code ../2018/fse/rp-sorted.txt
+.code compress/rp-sorted.txt
 
-.code ../2018/fse/rp-orig-hist.txt
+.code compress/rp-orig-hist.txt
 
 * Entropy Coding
 
 A way to increase compression is to reduce the *number* *of* *symbols*.
 
-.image ../2018/fse/rp-post-4.png
+.image compress/rp-post-4.png
 .caption Image reduced to 64 colors
 
-.code ../2018/fse/rp-post-4.txt
+.code compress/rp-post-4.txt
 
-.code ../2018/fse/rp-orig-hist.txt
+.code compress/rp-orig-hist.txt
 
 * Entropy Coding
 
 Fewer symbols = more compression.
 
-.image ../2018/fse/rp-post-50.png
+.image compress/rp-post-50.png
 .caption Image reduced to 6 colors
 
-.code ../2018/fse/rp-post-50.txt
+.code compress/rp-post-50.txt
 
-.code ../2018/fse/rp-orig-hist.txt
+.code compress/rp-orig-hist.txt
 
 * Entropy Coding
 
 Finally, the more skewed the distribution, the better compression.
 
-.image ../2018/fse/rp-downleft.png
+.image compress/rp-downleft.png
 .caption Lossless down + left delta encoded image.
 
-.code ../2018/fse/rp-downleft.txt
+.code compress/rp-downleft.txt
 
-.code ../2018/fse/rp-orig-hist.txt
+.code compress/rp-orig-hist.txt
 
 * Entropy Coding
 
 Combining that with reduction of symbol count gives us really good compression.
 
-.image ../2018/fse/rp-post-32-downleft.png
+.image compress/rp-post-32-downleft.png
 .caption Reduced to 8 colors, then down + left delta encoding.
 
-.code ../2018/fse/rp-post-32-downleft.txt
+.code compress/rp-post-32-downleft.txt
 
-.code ../2018/fse/rp-orig-hist.txt
-
-
-* Use of Entropy Coding
-
-Entropy Encoding is often used together with other compression algorithms, typically LZ.
-
-Entropy Coding is typically used to compress the *output* of Dictionary Coders, eg. zlib deflate, zstandard, lzma (7zip, xz), brotli.
+.code compress/rp-orig-hist.txt
 
 * Huffman Entropy Coding
 
-.image ../2018/fse/huffman_encoding_small.png
+.image compress/huffman_encoding_small.png
 .caption Huffman encoding. Remixed from “mason jennings:living in the moment” by Lali Masriera.
 
 Huffman produces an encoding tree, where the symbol probability defines its placement in the output tree.
@@ -313,13 +307,13 @@ However, Huffman trees are compact and en/decoding is pretty fast, which is why 
 
 * Introducing Finite State Entropy
 
-.image ../2018/fse/new.jpg
+.image compress/new.jpg
 
 * Finite State Entropy
 
 Based on *Asymmetric* *Numeral* *Systems* (ANS) developed and released as Public Domain by [[http://th.if.uj.edu.pl/~dudaj/][Jarek Duda]] from around 2007 and forward.
 
-.image ../2018/fse/ans-paper.png
+.image compress/ans-paper.png
 .caption [[https://arxiv.org/abs/1311.2540][Paper on ANS encoding]]
 
 ANS is itself an improvement of Arithmetic Coding developed in the 1970s mostly by IBM, but which has mostly been considered too slow for practical use.
@@ -332,7 +326,7 @@ FSE is based on a state table.
 
 The size of the table is a variable power of two and the current state is simply an offset in the table.
 
-.image ../2018/fse/table.png
+.image compress/table.png
 .caption Not an actual FSE table.
 
 * What is the state table?
@@ -346,7 +340,7 @@ Let's say we want to create a table with `A:47%,` `B:27%,` `C:20%,` `D:6%`
 
 If we want a table with 16 entries we get `A:8`, `B:4,` `C:3,` `D:1`:
 
-.image ../2018/fse/table-example.png
+.image compress/table-example.png
 .caption Artistic representation of a table with the symbols `A,B,C,D`.
 
 
@@ -388,18 +382,9 @@ These are pure LZ77 compressors with no entropy encoding meaning things like ran
 
 LZ4 and Snappy are pretty equivalent, with LZ4 being more flexible for better or worse.
 
-* S2
+LZ4 just got parallel stream compression, yay!
 
-Developed with high throughput as core feature.
-
-S2 is a one way backwards compatible extension of Snappy by yours truly, offering better compression, faster decompression and concurrent encoding. Only available in Go.
-
-Designed for machine generated content (repeat codes), preferring longer byte matches for faster decompression.
-
-Concurrent compression, speed typically at Snappy speed per core and better compression.
-
-Offers slightly more CPU intensive mode, still typically IO limited.
-
+S2 and LZ4 pretty equivalent now.
 
 * DEFLATE/zip/gzip/zlib
 
@@ -457,27 +442,25 @@ Offers very flexible compression/speed tradeoff and a solid and well-supported i
 - Fast decompression.
 - Open Source and well supported.
 
+No parallel compression (yet)
 
-* Recommendations?
 
-Zstandard is a very good "default" choice.
+* Benchmarking
 
-There may be some specialized cases where specific implementations make the most sense.
-
-.caption Open Source and well tested is an absolute requirement.
 
 
 * Recommendations?
 
 >>> *Absolute* *Speed*
 
-- S2 (not super well tested yet)
-- LZ4 / Snappy
+- S2 (new) / LZ4
+- Snappy - mostly worse.
 - zstd (good, but slightly slower)
 
 >>> *Compatibility* 
 
 - Gzip (deflate). [[https://github.com/klauspost/pgzip][`pgzip`]] for streams.
+- LZ4 
 
 >>> *Seeking*
 
