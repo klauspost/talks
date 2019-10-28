@@ -8,15 +8,15 @@ Software Engineer, MinIO
 klaus@minio.io
 @sh0dan
 
-* Agenda
+* Talk overview
 
 .background ./zstd/bg.png
 
 - LZ77 coding
-- Snappy -> S2 improvements
 - Entropy coding
+- Benchmarking
 - Overview of formats
-- Compression recommendation
+- Recommendations
 
 Disclaimer: This talk will simplify some aspects to keep it rather brief.
 
