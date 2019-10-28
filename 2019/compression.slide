@@ -178,23 +178,6 @@ Result:
 	* Copy 16 bytes `><ATOMIC_WEIGHT>`.
 
 
-* Snappy -> S2 changes
-
-Made for high throughput, Snappy compatible format.
-
-- Max block size 64KB -> 1MB (4MB default)
-- Add repeat matches
-- Hash longer values (4->6 bytes)
-- Add backwards match search
-- Check 2 matches + 1 repeat every 4 bytes
-- Parallel Stream Encoding
-
-Has optional, slightly slower but with *better* compression mode:
-
-Uses a short (4 byte) and long (7 byte) match hash table.
-Tries to find a long match at position + 1 when a short match is found.
-
-
 * Entropy Coding
 
 * What is Entropy Coding?
@@ -228,7 +211,7 @@ A visual example:
 
 * Entropy Coding
 
-The main difference from Entropy Coding and other common compression algorithms is that it does not care (much) about the *order* of the input symbols.
+The main difference from Entropy Coding and LZ77 is that it does not care (much) about the *order* of the input symbols.
 
 .image compress/rp-scrambled.png
 .caption Same image with pixels moved around randomly. Trust me: Same picture
@@ -346,25 +329,6 @@ If we want a table with 16 entries we get `A:8`, `B:4,` `C:3,` `D:1`:
 
 * [Skipping Details]
 
-* Go Implementation
-
-Encoding and decoding [[https://godoc.org/github.com/klauspost/compress/fse][`github.com/klauspost/compress/fse`]], compatible with zstandard.
-
-Simple interface:
-
-    func Compress(in []byte, s *Scratch) ([]byte, error)
-    func Decompress(b []byte, s *Scratch) ([]byte, error)
-
-Solid performance. Compressing 100k digits of `e`, single core:
-
-    BenchmarkCompress/digits-8                  3000            498174 ns/op         200.74 MB/s
-    BenchmarkDecompress/digits-8                5000            342608 ns/op         291.89 MB/s
-
-Still not as fast as deflate (Huffman) / huff0 (experimental)
-
-    BenchmarkDeflate/digits-8                   3000            395350 ns/op         252.95 MB/s
-    BenchmarkCompress1XReuseNone/digits-8       5000            323744 ns/op         308.89 MB/s
-
 * Other Compression Improvement Techniques
 
 There are a number of methods that can further improve compression.
@@ -374,17 +338,61 @@ There are a number of methods that can further improve compression.
 - Context Mixing. Maintain n states and have logic or a neural network decide between them. Very slow, also on decompression.
 
 
+* Benchmarking
+
+- Always use "real" data
+- Test multiple data types
+- Make sure you aren't testing GC
+- Test single core AND all core throughput
+- Test incompressible input
+
+[[https://docs.google.com/spreadsheets/d/1nuNE2nPfuINCZJRMt6wFWhKpToF95I47XjSsc-1rbPQ/edit?usp=sharing][Example Benchmarks]]:
+
+- Evaluate compression per thoughput
+- Remember decompression speed
+
+* Example - JSON
+
+.image compress/json-data.png
+
+* Binary Serialized Data
+
+.image compress/serialized-data.png
+
+* Database Raw Data
+
+.image compress/consensusdb-data.png
+
+
 * Compression Schemes TLDR;
 
 * LZ4/Snappy/S2
 
-These are pure LZ77 compressors with no entropy encoding meaning things like random base64 data will not be compressed.
-
-LZ4 and Snappy are pretty equivalent, with LZ4 being more flexible for better or worse.
+These are pure LZ77 compressors. No entropy encoding. Base 64 :(
 
 LZ4 just got parallel stream compression, yay!
 
+LZ4 > Snappy (more flexible)
+
 S2 and LZ4 pretty equivalent now.
+
+.image compress/s2.png
+
+* Snappy -> S2 changes
+
+Made for high throughput, Snappy compatible format.
+
+- Max block size 64KB -> 1MB (4MB default)
+- Add repeat matches
+- Hash longer values (4->6 bytes)
+- Add backwards match search
+- Check 2 matches + 1 repeat every 4 bytes
+- Parallel Stream Encoding
+
+Has optional, slightly slower but with *better* compression mode:
+
+Uses a short (4 byte) and long (7 byte) match hash table.
+Tries to find a long match at position + 1 when a short match is found.
 
 * DEFLATE/zip/gzip/zlib
 
@@ -396,7 +404,7 @@ Compression can be done concurrently in blocks, but for decompression that is im
 
 It is beginning to show its age, especially with low, non-parallel decompression speed.
 
-* BZ2
+* bzip2
 
 Uses RLE, Huffman and a number of transforms.
 
@@ -412,7 +420,7 @@ LZMA2 is mostly a wrapper for LZMA to make parallel block compression possible.
 
 Uses a range coder for entropy coding, better than Huffman but slower.
 
-Generally compresses quite well, is pretty flexible, but doesn't offer really high speed variants.
+Generally compresses quite well. Pretty flexible, but doesn't offer really high speed variants.
 
 No good Go implementation AFAIK.
 
@@ -442,20 +450,15 @@ Offers very flexible compression/speed tradeoff and a solid and well-supported i
 - Fast decompression.
 - Open Source and well supported.
 
-No parallel compression (yet)
-
-
-* Benchmarking
-
+No parallel Go compression (yet)
 
 
 * Recommendations?
 
 >>> *Absolute* *Speed*
 
-- S2 (new) / LZ4
-- Snappy - mostly worse.
-- zstd (good, but slightly slower)
+- LZ4 - S2
+- zstd
 
 >>> *Compatibility* 
 
@@ -495,5 +498,12 @@ No parallel compression (yet)
 .image zstd/win.jpg _ 500
 .caption "Wine Robot" by [[https://www.flickr.com/photos/jnachman/][Jnipco]].
 
+* Links
 
+- https://github.com/pierrec/lz4
+- https://github.com/golang/snappy
+- https://github.com/klauspost/compress (gzip, zstd, s2, zlib, deflate, huff0, fse)
+- https://github.com/klauspost/pgzip
+- https://github.com/andybalholm/brotli
 
+- https://github.com/klauspost/readahead (async readahead)
