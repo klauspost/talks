@@ -26,6 +26,8 @@ Disclaimer: This talk will simplify some aspects to keep it rather brief.
 
 * LZ77 coding
 
+.image compress/lz77.png
+
 Compression purely based on referencing previously seem data, typically with a fixed size history.
 
 The output of the LZ77 can usually be compressed further, but some formats store output as is.
@@ -37,6 +39,8 @@ Zstandard can operate in pure LZ77 mode, but with more efficient/slightly slower
 This is still the baseline of most popular compression formats today.
 
 * Zstandard Example
+
+.image compress/zstd_logo86.png
 
 Sequences describe how to reconstruct the output using matches from previous output and bytes from the literals section.
 
@@ -73,6 +77,8 @@ For all bytes in input:
 	7) GOTO 1
 
 Pretty much the main loop of LZ4, Snappy, S2, fast modes in deflate, zstd, etc.
+
+.image ./compress/circular.png 200 200
 
 * Hash table
 
@@ -160,7 +166,7 @@ Very good for machine generated data.
 
 Since we have a rather low quality hash table, and may skip input, we might miss some matches.
 
-This means that when we find a match, we also try to match the bytes we skipped and extend our match backwards.
+When we find a match, we also try to match the bytes we skipped and extend our match backwards.
 
 This seems obvious now, but is also a trick I first saw in Zstandard.
 
@@ -189,6 +195,9 @@ They perform an operation where they reduce a block of input *symbols* to be rep
 A *symbol* means a value in terms of entropy encoding. It *can* be a byte, but entropy encoding can operate on any value sizes.
 
 .background zstd/bg.png
+
+.image compress/symbols.jpg
+.caption [[https://flic.kr/p/8HqG2W][symbols]] (cc) by Steven Taschuk.
 
 * Entropy Coding
 
@@ -288,6 +297,8 @@ The main downside is that since we need at least 1 bit to represent a symbol thi
 
 However, Huffman trees are compact and en/decoding is pretty fast, which is why Huffman has been preferred for a long time.
 
+.image compress/huffman_encoding_small.png 300 _
+
 * Introducing Finite State Entropy
 
 .image compress/new.jpg
@@ -329,6 +340,7 @@ If we want a table with 16 entries we get `A:8`, `B:4,` `C:3,` `D:1`:
 
 * [Skipping Details]
 
+
 * Other Compression Improvement Techniques
 
 There are a number of methods that can further improve compression.
@@ -337,6 +349,8 @@ There are a number of methods that can further improve compression.
 - Input Transformation. Make the content easier to compress. Usually rather slow.
 - Context Mixing. Maintain n states and have logic or a neural network decide between them. Very slow, also on decompression.
 
+.image compress/ai.jpg 225 _
+.caption [[https://flic.kr/p/27pq9bw][Machine Learning & Artificial Intelligence]] (cc) by Mike MacKenzie.
 
 * Benchmarking
 
@@ -391,8 +405,9 @@ Made for high throughput, Snappy compatible format.
 
 Has optional, slightly slower but with *better* compression mode:
 
-Uses a short (4 byte) and long (7 byte) match hash table.
-Tries to find a long match at position + 1 when a short match is found.
+- Double hash table
+
+Used in production on MinIO servers, with rolling upgrade from Snappy.
 
 * DEFLATE/zip/gzip/zlib
 
@@ -402,7 +417,7 @@ The standard scheme for many, many years.
 
 Compression can be done concurrently in blocks, but for decompression that is impossible.
 
-It is beginning to show its age, especially with low, non-parallel decompression speed.
+It is beginning to show its age.
 
 * bzip2
 
@@ -414,7 +429,7 @@ Do not use.
 
 * LZMA/LZMA2/xz
 
-Very efficient compression scheme, first with repeat offset codes. 
+Very efficient compression scheme, first with repeat offset codes AFAIK.
 
 LZMA2 is mostly a wrapper for LZMA to make parallel block compression possible.
 
@@ -440,6 +455,8 @@ Good for static HTTP content. Not highly recommended elsewhere.
 A fairly new Go package is available. Pretty slow.
 
 * Zstandard
+
+.image compress/zstd_logo86.png
 
 Flexible and efficient compression format.
 
@@ -507,3 +524,6 @@ No parallel Go compression (yet)
 - https://github.com/andybalholm/brotli
 
 - https://github.com/klauspost/readahead (async readahead)
+
+.image zstd/chains.jpg _ 300
+.caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
