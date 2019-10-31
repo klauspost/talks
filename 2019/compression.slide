@@ -362,7 +362,7 @@ There are a number of methods that can further improve compression.
 
 [[https://docs.google.com/spreadsheets/d/1nuNE2nPfuINCZJRMt6wFWhKpToF95I47XjSsc-1rbPQ/edit?usp=sharing][Example Benchmarks]]:
 
-- Evaluate compression per thoughput
+- Evaluate compression per throughput
 - Remember decompression speed
 
 * Example - JSON
@@ -517,13 +517,13 @@ No parallel Go compression (yet)
 
 * Links
 
-- https://github.com/pierrec/lz4
-- https://github.com/golang/snappy
-- https://github.com/klauspost/compress (gzip, zstd, s2, zlib, deflate, huff0, fse)
-- https://github.com/klauspost/pgzip
-- https://github.com/andybalholm/brotli
+.link https://github.com/pierrec/lz4
+.link https://github.com/golang/snappy
+.link https://github.com/klauspost/compress github.com/klauspost/compress (gzip, zstd, s2, zlib, deflate, huff0, fse)
+.link https://github.com/klauspost/pgzip
+.link https://github.com/andybalholm/brotli
 
-- https://github.com/klauspost/readahead (async readahead)
+.link https://github.com/klauspost/readahead github.com/klauspost/readahead (async readahead)
 
 .image zstd/chains.jpg _ 300
 .caption "chains" by [[https://www.flickr.com/photos/oliverjd/][Oliver Dunkley]].
