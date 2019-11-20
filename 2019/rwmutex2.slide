@@ -1,7 +1,7 @@
 Taming Mutexes for Concurrency
 
 Copenhagen Gophers
-20th November 2019
+19th November 2019
 
 Klaus Post
 Software Engineer, MinIO
@@ -475,7 +475,7 @@ Biggest list: “vintages-global”
 
 Roberto Clapis @empijei on Contention: 
 
-[GoLab 2019 - Roberto Clapis - Tackling contention](https://www.youtube.com/watch?v=_4HHyVBMY1M )
+[[https://www.youtube.com/watch?v=_4HHyVBMY1M][GoLab 2019 - Roberto Clapis - Tackling contention]]
 
 Covers everything about choosing mutexes and performance.
 
