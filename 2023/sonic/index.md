@@ -1,3 +1,5 @@
+<!-- CC BY-SA Klaus Post https://creativecommons.org/licenses/by-sa/4.0/deed.en -->
+
 <!-- 
 theme: gaia
 class: 
@@ -26,7 +28,6 @@ Klaus Post @ Golab 2023
 
 ![bg right:35% brightness:0.75 Chris Yunker](img/florence.jpg)
 
-<!-- HTML comment recognizes as a presenter note per pages. -->
 
 ---
 
@@ -34,13 +35,14 @@ Klaus Post @ Golab 2023
 
 ![bg right:50%](img/Waterhouse_decameron.jpg)
 
-<!-- HTML comment recognizes as a presenter note per pages. -->
 
 ---
 
 # Our stories are linear
 
-We build our perception from linear events.
+We build our perception from linear events
+
+Cause and Effect
 
 <!-- We arrange them in sequence and learn from cause+effect -->
 
@@ -88,6 +90,8 @@ A CPU is like a good story. It has several parallel plotlines.
 * Uniformity
 * 🤯
 
+![bg right:35% Alan Levine](img/network.jpg)
+
 ---
 
 # The pieces of the puzzle
@@ -96,6 +100,9 @@ A CPU is like a good story. It has several parallel plotlines.
 * Sequential execution doesn't get much better
 * The only way to scale is to go parallel
 * Design is now more important than ever
+
+![bg right:35% INTVGene](img/puzzle.jpg)
+
 
 ---
 
@@ -109,7 +116,8 @@ A CPU is like a good story. It has several parallel plotlines.
 
 # How do we start thinking about this?
 
-<!-- Picture of a Ferrari -->
+![bg brightness:50% Klaus Post](img/f1-full.jpg)
+
 
 ----
 # How to build a race car?
@@ -120,12 +128,14 @@ A CPU is like a good story. It has several parallel plotlines.
 * Money helps, but there is no pay-to-win
 * CFD cannot tell you how the car is to drive
 
+![bg right:35% saturate:75% Klaus Post](img/f1-port2.jpg)
+
 ----
 # How to build a car?
 
 > **If you get the underlying architecture wrong at the very least you stuck with it for a season.**
 
-> *Andrian Newey, F1 podcast*
+*Andrian Newey, F1 podcast*
 
 ----
 
@@ -219,6 +229,11 @@ Learn to understand the output of these tools.
 
 # Build your dreams
 
+* Keep an open mind
+* Feels like a puzzle
+* Remember it is a SKILL that builds with PRACTICE
+
+
 ![bg grayscale:1 right:30% contrast:150%](img/san-matteo.jpg)
 
 ---
@@ -231,9 +246,9 @@ Learn to understand the output of these tools.
 
 # Thank You!
 
-`𝕏: @sh0dan`
-
 Klaus Post @ Golab 2023
+
+`𝕏: @sh0dan`
 
 ![h:30px](img/minio.png)
 
