@@ -10,8 +10,9 @@ class:
   :root {
     --color-background: #012b35;
     --color-foreground: #edf7f7;
-    --color-highlight: #c72e49;
-    --color-dimmed: #00ab8a;
+    --color-highlight: #9681c7;
+    --color-dimmed: #9681c7;
+    --color-dimmed: #95d549;
   }
 </style>
 
@@ -68,7 +69,7 @@ A CPU is like a good story. It has several parallel plotlines.
  * Hyperthreading
 
 
-![bg right:30%](img/AMD_Athlon_XP_Thoroughbred_die.jpg)   
+![bg right:30% constrast:200%](img/AMD_Athlon_XP_Thoroughbred_die.jpg)   
 
 ---
 
@@ -137,6 +138,8 @@ A CPU is like a good story. It has several parallel plotlines.
 
 *Andrian Newey, F1 podcast*
 
+![bg right:35% saturate:85% AtomsRavelAz](img/Adrian_Newey_2011.jpg)
+
 ----
 
 # Building on Faith
@@ -157,6 +160,8 @@ Big leaps can require an amount of faith.
 * Architecture sets the asymptotic limit
 * Testing must correlate with reality
 
+![bg right:38% saturate:85% Klaus Post](img/podium.jpg)
+
 ---
 # How to think about speed?
 
@@ -167,7 +172,7 @@ Big leaps can require an amount of faith.
 # Speeding up...
 
 * Most speedups are specializations
-* Speedups seem obvious afterwards - just need to think of them
+* Speedups seem obvious afterward - creativity.
 * Focus on proven bottlenecks
 * Allocations
 
@@ -240,7 +245,7 @@ Learn to understand the output of these tools.
 
 # Q & A
 
-
+![Questions](img/questions-tr.png)
 
 ---
 
