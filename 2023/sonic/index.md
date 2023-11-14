@@ -4,7 +4,10 @@
 theme: gaia
 class: 
     - lead
+paginate: false
 -->
+
+<!-- size: 16:9 -->
 
 <style>
   :root {
@@ -22,6 +25,7 @@ Klaus Post @ Golab 2023
 
 ![h:30px](img/minio.png)
 
+Slides: https://golab.klauspost.com
 
 ---
 
