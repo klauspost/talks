@@ -66,10 +66,10 @@ A CPU is like a good story. It has several parallel plotlines.
  * Out-of-order execution
  * Speculative execution
  * Caching
- * Hyperthreading
+ * Hyperthreading.
 
 
-![bg right:30% constrast:200%](img/AMD_Athlon_XP_Thoroughbred_die.jpg)   
+![bg sepia right:30% constrast:200%](img/AMD_Athlon_XP_Thoroughbred_die.jpg)   
 
 ---
 
@@ -78,7 +78,7 @@ A CPU is like a good story. It has several parallel plotlines.
 ... all with several parallel plotlines?
 
 <!-- CPU picture... Multiple cores -->
-![bg right:35%](img/AMD-Ryzen-5000-Zen-3-Desktop-CPU_Vermeer_Die-Shot_1-1030x679.jpg)
+![bg right:35% saturate:50%](img/AMD-Ryzen-5000-Zen-3-Desktop-CPU_Vermeer_Die-Shot_1-1030x679.jpg)
 
 ---
 
@@ -91,7 +91,7 @@ A CPU is like a good story. It has several parallel plotlines.
 * Uniformity
 * 🤯
 
-![bg right:35% Alan Levine](img/network.jpg)
+![bg right:35% CC-BY Alan Levine](img/network.jpg)
 
 ---
 
@@ -100,9 +100,9 @@ A CPU is like a good story. It has several parallel plotlines.
 * More complexity and data than ever
 * Sequential execution doesn't get much better
 * The only way to scale is to go parallel
-* Design is now more important than ever
+* Design is now more important than ever.
 
-![bg right:35% INTVGene](img/puzzle.jpg)
+![bg right:35% CC-BY-SA INTVGene](img/puzzle.jpg)
 
 
 ---
@@ -111,7 +111,9 @@ A CPU is like a good story. It has several parallel plotlines.
 
 * Gives a linearly designed system
 * Limited window for optimizations
-* Optimizations start at the top
+* Optimizations start at the top.
+
+![bg right:33% CC-BY-NC Thomas Hawk](img/v1.jpg)
 
 ---
 
@@ -127,7 +129,7 @@ A CPU is like a good story. It has several parallel plotlines.
 * Not a solved problem 
 * Every decision is a tradeoff
 * Money helps, but there is no pay-to-win
-* CFD cannot tell you how the car is to drive
+* CFD cannot tell you how the car is to drive.
 
 ![bg right:35% saturate:75% Klaus Post](img/f1-port2.jpg)
 
@@ -150,7 +152,10 @@ Big leaps can require an amount of faith.
 * ... except like [The Story of the Ferrari 640](https://www.youtube.com/watch?v=QBCwNINnAYY)
 * You can't always test big changes before the system is complete
 * Convince your most pessimistic colleague
-* Be clear about risks and rewards
+* Be clear about risks and rewards.
+
+![bg right:20% CC-BY-NC Jagrap](img/ildomo.jpg)
+
 
 ---
 
@@ -158,7 +163,7 @@ Big leaps can require an amount of faith.
 
 * You can *always* go faster
 * Architecture sets the asymptotic limit
-* Testing must correlate with reality
+* Testing must correlate with reality.
 
 ![bg right:38% saturate:85% Klaus Post](img/podium.jpg)
 
@@ -172,10 +177,11 @@ Big leaps can require an amount of faith.
 # Speeding up...
 
 * Most speedups are specializations
-* Speedups seem obvious afterward - creativity.
+* Speedups seem obvious afterward - creativity
 * Focus on proven bottlenecks
-* Allocations
+* Allocations.
 
+![bg right:38% saturate:85% Klaus Post](img/speed.jpg)
 
 ---
 
@@ -188,6 +194,9 @@ Big leaps can require an amount of faith.
 * Experiment with division of work
 * Buffers or low latency?
 
+![bg right:38% CC-BY credit: homegets.com](img/pasta.jpg)
+
+
 ---
 
 # Get out of your comfort zone
@@ -195,7 +204,9 @@ Big leaps can require an amount of faith.
 * Think concurrent
 * Consider points that will serialize your code
 * Follow the code
-* Limit your indexing
+* Limit your indexing.
+
+![bg right:33% CC-NC-ND Neal Wellons](img/comfortable.jpg)
 
 ---
 
@@ -211,6 +222,8 @@ Big leaps can require an amount of faith.
 
 Learn to understand the output of these tools.
 
+![bg right:25% CC-BY-NC Daniel Go](img/tools.jpg)
+
 ---
 
 # Myths & Legends
@@ -221,6 +234,9 @@ Learn to understand the output of these tools.
 * Memory always go to cache
 * Your CPU is incredible (no matter ISA)
 
+![bg right:25% Stable Diffusion Klaus Post](img/unicorns.jpg)
+
+
 ---
 
 # Test (your assumptions)
@@ -228,7 +244,9 @@ Learn to understand the output of these tools.
 * Always test your assumptions
 * Benchmarks should correlate with real use
 * Benchmarks should be reproducible
-* Microbenchmarks are often misleading
+* Microbenchmarks are often misleading.
+
+![bg right:30% CC-BY-NC U.S. Pacific Fleet](img/hornet.jpg)
 
 ---
 
@@ -236,7 +254,7 @@ Learn to understand the output of these tools.
 
 * Keep an open mind
 * Feels like a puzzle
-* Remember it is a SKILL that builds with PRACTICE
+* Remember it is a SKILL that builds with PRACTICE.
 
 
 ![bg grayscale:1 right:30% contrast:150%](img/san-matteo.jpg)
