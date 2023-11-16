@@ -14,7 +14,6 @@ paginate: false
     --color-background: #012b35;
     --color-foreground: #edf7f7;
     --color-highlight: #9681c7;
-    --color-dimmed: #9681c7;
     --color-dimmed: #95d549;
   }
 </style>
@@ -115,7 +114,8 @@ A CPU is like a good story. It has several parallel plotlines.
 
 * Gives a linearly designed system
 * Limited window for optimizations
-* Optimizations start at the top.
+* Optimizations start at the top
+* 1000s of small "correct" decisions.
 
 ![bg right:33% CC-BY-NC Thomas Hawk](img/v1.jpg)
 
@@ -177,6 +177,22 @@ Big leaps can require an amount of faith.
 ![bg](img/factorio.jpg)
 
 ---
+# How to think about speed?
+
+<style scoped>
+  section {
+    --color-highlight: #edf7f7;
+  }
+</style>
+
+![bg](img/factorio-darker.jpg)
+
+- [Is Factorio the same as Programming?](https://youtu.be/aaBXrkA0iTs)
+- [CPU in Factorio](https://www.youtube.com/playlist?list=PLXdHPlvO9PvDQE78amGhUGlZHpc__5UId)
+- [Ray Casting in Factorio](https://youtu.be/7lVAFcDX4eM)
+- [B-trees in Factorio](https://youtu.be/2oRCUNnofDA)
+
+---
 
 # Speeding up...
 
@@ -208,9 +224,9 @@ Big leaps can require an amount of faith.
 * Think concurrent
 * Consider points that will serialize your code
 * Follow the code
-* Limit your indexing.
+* Limit use of centralised/indexed functions. 
 
-![bg right:33% CC-NC-ND Neal Wellons](img/comfortable.jpg)
+![bg right:33% grayscale CC-NC-ND Neal Wellons](img/comfortable.jpg)
 
 ---
 
