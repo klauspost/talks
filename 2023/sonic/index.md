@@ -71,7 +71,6 @@ A CPU is like a good story. It has several parallel plotlines.
  * Caching
  * Hyperthreading.
 
-
 ![bg sepia right:30% constrast:200%](img/AMD_Athlon_XP_Thoroughbred_die.jpg)   
 
 ---
@@ -107,7 +106,6 @@ A CPU is like a good story. It has several parallel plotlines.
 
 ![bg right:35% CC-BY-SA INTVGene](img/puzzle.jpg)
 
-
 ---
 
 # v1 first, optimize later
@@ -115,7 +113,8 @@ A CPU is like a good story. It has several parallel plotlines.
 * Gives a linearly designed system
 * Limited window for optimizations
 * Optimizations start at the top
-* 1000s of small "correct" decisions.
+* 1000s of small "correct" decisions
+* Think `go`
 
 ![bg right:33% CC-BY-NC Thomas Hawk](img/v1.jpg)
 
@@ -216,7 +215,6 @@ Big leaps can require an amount of faith.
 
 ![bg right:38% CC-BY credit: homegets.com](img/pasta.jpg)
 
-
 ---
 
 # Get out of your comfort zone
@@ -224,7 +222,8 @@ Big leaps can require an amount of faith.
 * Think concurrent
 * Consider points that will serialize your code
 * Follow the code
-* Limit use of centralised/indexed functions. 
+* Global state feels good
+* Limit use of centralised/indexed functions.
 
 ![bg right:33% grayscale CC-NC-ND Neal Wellons](img/comfortable.jpg)
 
@@ -256,7 +255,6 @@ Learn to understand the output of these tools.
 
 ![bg right:25% Stable Diffusion Klaus Post](img/unicorns.jpg)
 
-
 ---
 
 # Test (your assumptions)
@@ -285,6 +283,8 @@ Learn to understand the output of these tools.
 
 ![Questions](img/questions-tr.png)
 
+Slides: https://golab.klauspost.com
+
 ---
 
 # Thank You!
@@ -294,4 +294,3 @@ Klaus Post @ Golab 2023
 `𝕏: @sh0dan`
 
 ![h:30px](img/minio.png)
-
