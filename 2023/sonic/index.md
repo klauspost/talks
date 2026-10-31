@@ -56,7 +56,8 @@ Cause and Effect
 
 How do you describe a system you are about to build?
 
-<!-- Is it a flowchart? It is a flowchart, right? -->
+* Is it a flowchart?
+* It is a flowchart, right?
 
  ----
 
