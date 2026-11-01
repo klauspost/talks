@@ -26,7 +26,11 @@ Klaus Post @ Golab 2026
 
 Slides: https://golab2026.klauspost.com
 
-100% meat-generated
+`100% meat-generated (except stats)`
+
+---
+
+![bg h:90%](img/memes/02.png)
 
 ---
 
@@ -41,7 +45,11 @@ Sometimes Compatibility
 ---
 
 # Generic Compression
-# Domain Specific
+# Domain Specific (+lossy)
+
+---
+
+![bg h:90%](img/memes/08.png)
 
 ---
 
@@ -65,7 +73,42 @@ Symbols (bytes) -> Bit Stream
 * Range Coding
 * ANS
 
-Completely unordered
+Not order dependent
+
+---
+
+# DEFLATE
+
+Create by Phil Katz for PKZIP
+
+![sepia Phil Katz - https://en.wikipedia.org/wiki/File:Phil_Katz.jpg](img/Phil_Katz.jpg)
+
+Huffman Stream with either a literal or a match.
+
+---
+
+![bg](img/deflate-buffers.png)
+
+
+---
+
+# Go 1.27 Improvements
+
+- Custom level 1-6 encoders
+- Huffman Encoding
+- Level 7-9 tweaks
+
+[NUMBERS pls](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&by=lib&lb=std%40go1.26.10,std%40go1.27.1)
+
+---
+
+# Stdlib Zstandard
+
+WIP - slow but steady.
+
+---
+
+![bg](img/zstd-buffers.png)
 
 ---
 
@@ -84,6 +127,12 @@ Example: Columnar data
 Select Encoder based on history.
 
 Good. Exotic. (Too) Slow.
+
+---
+
+# Benchmarking
+
+![h:50%](img/memes/03.jpg)
 
 ---
 
@@ -125,50 +174,25 @@ Window Size Compression
 
 Window Size Decompression
 
----
-
-# DEFLATE
-
-Create by Phil Katz for PKZIP
-
-![sepia Phil Katz - https://en.wikipedia.org/wiki/File:Phil_Katz.jpg](img/Phil_Katz.jpg)
-
-Huffman Stream with either a literal or a match.
-
----
-
-# Go 1.27 Improvements
-
-- Custom level 1-6 encoders
-- Huffman Encoding
-- Level 7-9 tweaks
-
----
-
-# Stdlib Zstandard
-
-WIP - slow but steady.
-
----
 
 # Third Party - Byte Aligned
 
-| Compressor | Main Upsides                | Main Downside      |
-|------------|-----------------------------|--------------------|
-| Snappy     | +Compatible, OK Speed       | Low Compression    |
-| LZ4        | +Compatible, +Speed, Simple | Low Compression    |
-| MinLZ      | +Speed, Backcompat          | Medium Compression |
+| Compressor | Main Upsides                | Main Downside |
+|------------|-----------------------------|---------------|
+| Snappy     | +Compatible, OK Speed       | Low Comp      |
+| LZ4        | +Compatible, +Speed, Simple | Low Comp      |
+| MinLZ      | +Speed, Backcompat          | Medium Comp   |
 
 ---
 
 # Third Party - Bit Aligned
 
-| Compressor     | Main Upsides                      | Main Downside                           |
-|----------------|-----------------------------------|-----------------------------------------|
-| gzip (deflate) | +Compatible                       | Slow decompression, Medium compresssion |
-| bzip2          | Compatible                        | Very Slow                               |
-| zstd           | Compatible, Size, Speed, Versaile | Good, not great decompression           |
-| brotli         | HTML, Size                        | Rarely the best, except when very slow  |
+| Compressor     | Main Upsides                      | Main Downside               |
+|----------------|-----------------------------------|-----------------------------|
+| gzip (deflate) | +Compatible                       | Slow Decomp, Medium Comp    |
+| bzip2          | Compatible                        | Very Slow, Including Decomp |
+| zstd           | Compatible, Size, Speed, Versaile | Good Decomp Speed           |
+| brotli         | HTML, Size                        | Rarely the best             |
 
 
 ---
@@ -181,13 +205,16 @@ Goal: Entropy coding with minimal extra CPU
 
 Achieved: Entropy coding with 2x-3x faster decompression
 
-ADD BLOCK DIAGRAM
+---
 
+![bg](img/simd-block-buffers.png)
 
 ---
 
 
 # Q & A
+
+![bg h:80% right:35% saturate:75%](img/memes/09.png)
 
 ![Questions](img/questions-tr.png)
 
