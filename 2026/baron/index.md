@@ -14,13 +14,16 @@ paginate: false
     --color-background: #012b35;
     --color-foreground: #edf7f7;
     --color-highlight: #9681c7;
-    --color-dimmed: #95d549;
+    --color-dimmed: #aaaaaa;
   }
 </style>
 
 # Go Data Compression
 
 Klaus Post @ Golab 2026
+
+`𝕏: @sh0dan`
+`🦋: @klauspost.com`
 
 ![h:30px](img/minio.png)
 
@@ -39,11 +42,13 @@ Minimize transfer and storage
 
 Always a CPU/size tradeoff
 
-Sometimes Compatibility 
+Sometimes Compatibility
+
+Handwaving will happen 👋
 
 ---
 
-# Compressor types
+# Compressor Classes
 
 * Generic Compression
 * Domain Specific (+lossy)
@@ -60,7 +65,7 @@ String of Operations
 
 Literals and back-references
 
-Main compression scheme
+Most common scheme
 
 [Example](block-vis/index.html)
 
@@ -145,24 +150,12 @@ Dimensions:
 * Memory Usage
 * Comp vs Decomp
 * Representative test data
-* CPU/memory
+* Physical CPU/Memory
 
 ---
 
-### [Let's see some Big Files](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&op=c)
-### [... and Small Files](http://127.0.0.1:8080/#k=dir&c=gofiles&m=1omrle93&t=1)
-
----
-
-![w:800px Threads Compression](./img/threads-comp.png)
-
-[Threads Compression](http://127.0.0.1:8080/#c=apache-log&m=1omrle93&t=1,2,4,8,12,16&by=threads&cd=minlz)
-
----
-
-![w:800px Threads Decompression](./img/threads-decomp.png)
-
-[Threads Decompression](http://127.0.0.1:8080/#c=apache-log&m=1omrle93&t=1,2,4,8,12,16&by=threads&cd=minlz)
+### [Let's see some Big Files](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&op=c&cd=br2,bz2,gzkp,lz4,minlz,snappy,zskp)
+### [... and Small Files](http://127.0.0.1:8080/#k=dir&c=gofiles&m=1omrle93&t=1&cd=br2,gzkp,lz4,minlz,snappy,zskp)
 
 ---
 
@@ -175,6 +168,18 @@ Window Size Compression
 ![w:800px Window Size Decompression](./img/window-decomp.png)
 
 Window Size Decompression
+
+---
+
+![w:800px Threads Compression](./img/threads-comp.png)
+
+[Threads Compression](http://127.0.0.1:8080/#c=apache-log&m=1omrle93&t=1,2,4,8,12,16&by=threads&cd=minlz)
+
+---
+
+![w:800px Threads Decompression](./img/threads-decomp.png)
+
+[Threads Decompression](http://127.0.0.1:8080/#c=apache-log&m=1omrle93&t=1,2,4,8,12,16&by=threads&cd=minlz)
 
 ---
 
@@ -199,16 +204,26 @@ Window Size Decompression
 | brotli         | HTML, Size                        | Rarely the best             |
 | lzma (xz, 7z)  | Size, Flexible                    | Slow Comp/Decomp            | 
 
+---
+
+# New Tech?
+
+Design a compressor purely around SIMD operations
+
+`pivco-huffman` simd entropy
+
+Goal: Entropy coding with minimal extra CPU
 
 ---
 
 # MinLZ SIMD Blocks
 
-Design a compressor purely around SIMD operations
-
-Goal: Entropy coding with minimal extra CPU
 
 Achieved: Entropy coding with 2x-3x faster decompression
+
+`amd64 avx2, avx512 - arm64 neon`
+
+[sure.. numbers pls](http://127.0.0.1:8080/#c=enwik9&m=1omrle93&t=1&cd=gzkp,minlz,mzsimd,zskp)
 
 ---
 
@@ -216,6 +231,18 @@ Achieved: Entropy coding with 2x-3x faster decompression
 
 ---
 
+# MinLZ
+
+* Blocks/Streams
+* Fully Seekable
+* Bloom Filter Search
+* Multithreaded
+* Snappy Backcompat
+* Neat CLI
+* Complete Spec
+* `github.com/minio/minlz`
+
+---
 
 # Q & A
 
@@ -227,7 +254,7 @@ Achieved: Entropy coding with 2x-3x faster decompression
 
 # Thank You!
 
-Klaus Post @ Golab 2026
+Klaus Post @ GoLab 2026
 
 `𝕏: @sh0dan`
 `🦋: @klauspost.com`
