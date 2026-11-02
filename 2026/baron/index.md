@@ -24,7 +24,6 @@ Klaus Post @ Golab 2026
 
 ![h:30px](img/minio.png)
 
-Slides: https://golab2026.klauspost.com
 
 `100% meat-generated (except stats)`
 
@@ -44,8 +43,10 @@ Sometimes Compatibility
 
 ---
 
-# Generic Compression
-# Domain Specific (+lossy)
+# Compressor types
+
+* Generic Compression
+* Domain Specific (+lossy)
 
 ---
 
@@ -98,7 +99,7 @@ Huffman Stream with either a literal or a match.
 - Huffman Encoding
 - Level 7-9 tweaks
 
-[NUMBERS pls](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&by=lib&lb=std%40go1.26.10,std%40go1.27.1)
+[NUMBERS pls](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&by=lib&cd=gzkp,gzstd&lb=std%40go1.26.10,std%40go1.27.1)
 
 ---
 
@@ -148,7 +149,8 @@ Dimensions:
 
 ---
 
-# [Let's see some](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&op=c)
+### [Let's see some Big Files](http://127.0.0.1:8080/#c=silesia&m=1omrle93&t=1&op=c)
+### [... and Small Files](http://127.0.0.1:8080/#k=dir&c=gofiles&m=1omrle93&t=1)
 
 ---
 
@@ -174,6 +176,8 @@ Window Size Compression
 
 Window Size Decompression
 
+---
+
 
 # Third Party - Byte Aligned
 
@@ -185,14 +189,15 @@ Window Size Decompression
 
 ---
 
-# Third Party - Bit Aligned
+# Bit Aligned
 
 | Compressor     | Main Upsides                      | Main Downside               |
 |----------------|-----------------------------------|-----------------------------|
-| gzip (deflate) | +Compatible                       | Slow Decomp, Medium Comp    |
-| bzip2          | Compatible                        | Very Slow, Including Decomp |
-| zstd           | Compatible, Size, Speed, Versaile | Good Decomp Speed           |
+| deflate (gz)   | +Compatible                       | Slow Decomp                 |
+| bzip2          | Compatible                        | Very Slow, incl Decomp      |
+| zstd           | Compatible, Versatile             | Hard to multithread         |
 | brotli         | HTML, Size                        | Rarely the best             |
+| lzma (xz, 7z)  | Size, Flexible                    | Slow Comp/Decomp            | 
 
 
 ---
