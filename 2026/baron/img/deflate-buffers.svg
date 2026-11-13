@@ -1,0 +1,363 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<rect width="1920" height="1080" fill="#ffffff"/>
+<text x="60" y="62" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="34" font-weight="bold" fill="#1d2330" text-anchor="start" >Deflate: encoder buffers</text>
+<text x="60" y="96" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="normal" fill="#5b6475" text-anchor="start" >Literals, lengths and distances are Huffman coded into a single bitstream, in parse order.</text>
+<circle cx="74" cy="262" r="14" fill="#1d2330"/>
+<text x="74" y="267.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" >1</text>
+<text x="98" y="269.7" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="bold" fill="#1d2330" text-anchor="start" >Parse</text>
+<text x="60" y="300" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >input, 32 KiB window</text>
+<text x="60" y="320" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >→ literals and matches</text>
+<line x1="360" y1="390" x2="360" y2="662" stroke="#c4cad6" stroke-width="1.2" stroke-dasharray="3 5"/>
+<line x1="660" y1="390" x2="660" y2="662" stroke="#c4cad6" stroke-width="1.2" stroke-dasharray="3 5"/>
+<line x1="900" y1="390" x2="900" y2="662" stroke="#c4cad6" stroke-width="1.2" stroke-dasharray="3 5"/>
+<line x1="1090" y1="390" x2="1090" y2="662" stroke="#c4cad6" stroke-width="1.2" stroke-dasharray="3 5"/>
+<line x1="1480" y1="390" x2="1480" y2="662" stroke="#c4cad6" stroke-width="1.2" stroke-dasharray="3 5"/>
+<rect x="331" y="246" width="28" height="56" rx="3" fill="#f3f5f8" stroke="#a3abba" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="345.0" y="281.7" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="normal" fill="#5b6475" text-anchor="middle" >…</text>
+<rect x="361" y="246" width="148" height="56" rx="3" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="375" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >l</text>
+<line x1="390" y1="252" x2="390" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="405" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >o</text>
+<line x1="420" y1="252" x2="420" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="435" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >r</text>
+<line x1="450" y1="252" x2="450" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="465" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >e</text>
+<line x1="480" y1="252" x2="480" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="495" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >m</text>
+<rect x="511" y="246" width="148" height="56" rx="3" fill="#e4e9f1" stroke="#56637d" stroke-width="1.4" />
+<text x="585.0" y="269.95" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >match 4</text>
+<text x="585.0" y="290.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >offset 20</text>
+<rect x="661" y="246" width="58" height="56" rx="3" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="675" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >i</text>
+<line x1="690" y1="252" x2="690" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="705" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >p</text>
+<rect x="721" y="246" width="178" height="56" rx="3" fill="#e4e9f1" stroke="#56637d" stroke-width="1.4" />
+<text x="810.0" y="269.95" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >match 6</text>
+<text x="810.0" y="290.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >offset 20</text>
+<rect x="901" y="246" width="188" height="56" rx="3" fill="#e4e9f1" stroke="#56637d" stroke-width="1.4" />
+<text x="995.0" y="269.95" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >match 8</text>
+<text x="995.0" y="290.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >offset 3</text>
+<rect x="1091" y="246" width="88" height="56" rx="3" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1105" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >s</text>
+<line x1="1120" y1="252" x2="1120" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="1135" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >u</text>
+<line x1="1150" y1="252" x2="1150" y2="296" stroke="#b88a00" stroke-opacity=".45"/>
+<text x="1165" y="282.05" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="23" font-weight="bold" fill="#1d2330" text-anchor="middle" >m</text>
+<rect x="1181" y="246" width="298" height="56" rx="3" fill="#e4e9f1" stroke="#56637d" stroke-width="1.4" />
+<text x="1330.0" y="269.95" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >match 40</text>
+<text x="1330.0" y="290.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >offset 1000</text>
+<rect x="1481" y="246" width="168" height="56" rx="3" fill="#f3f5f8" stroke="#a3abba" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="1565.0" y="279.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="middle" >… more operations</text>
+<rect x="1661" y="246" width="188" height="56" rx="3" fill="#f3f5f8" stroke="#a3abba" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="1755.0" y="281.7" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="normal" fill="#5b6475" text-anchor="middle" >…</text>
+<path d="M1180,246 L1180,206 Q1180,200 1174,200 L342,200 Q336,200 336,206 L336,237" fill="none" stroke="#56637d" stroke-width="1.6" />
+<path d="M331.5,236 L340.5,236 L336,245 Z" fill="#56637d"/>
+<path d="M720,246 L720,219 Q720,213 714,213 L350,213 Q344,213 344,219 L344,237" fill="none" stroke="#56637d" stroke-width="1.6" />
+<path d="M339.5,236 L348.5,236 L344,245 Z" fill="#56637d"/>
+<path d="M510,246 L510,232 Q510,226 504,226 L358,226 Q352,226 352,232 L352,237" fill="none" stroke="#56637d" stroke-width="1.6" />
+<path d="M347.5,236 L356.5,236 L352,245 Z" fill="#56637d"/>
+<path d="M900,246 L900,232 Q900,226 894,226 L816,226 Q810,226 810,232 L810,237" fill="none" stroke="#56637d" stroke-width="1.6" />
+<path d="M805.5,236 L814.5,236 L810,245 Z" fill="#56637d"/>
+<path d="M332,192 Q332,184 340,184 L983.0,184 Q991.0,184 991.0,176 Q991.0,184 999.0,184 L1642,184 Q1650,184 1650,192" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="991" y="171.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >block 1 · length chosen by the encoder</text>
+<path d="M1662,192 Q1662,184 1670,184 L1747.0,184 Q1755.0,184 1755.0,176 Q1755.0,184 1763.0,184 L1840,184 Q1848,184 1848,192" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="1755" y="171.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >block 2</text>
+<line x1="1655" y1="150" x2="1655" y2="308" stroke="#5b6475" stroke-width="1.6" stroke-dasharray="6 4"/>
+<path d="M364,308 Q364,315 371,315 L503.0,315 Q510.0,315 510.0,322 Q510.0,315 517.0,315 L649,315 Q656,315 656,308" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="510.0" y="341.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#5b6475" text-anchor="middle" >op 1</text>
+<path d="M664,308 Q664,315 671,315 L773.0,315 Q780.0,315 780.0,322 Q780.0,315 787.0,315 L889,315 Q896,315 896,308" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="780.0" y="341.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#5b6475" text-anchor="middle" >op 2</text>
+<path d="M904,308 Q904,315 911,315 L988.0,315 Q995.0,315 995.0,322 Q995.0,315 1002.0,315 L1079,315 Q1086,315 1086,308" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="995.0" y="341.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#5b6475" text-anchor="middle" >op 3</text>
+<path d="M1094,308 Q1094,315 1101,315 L1278.0,315 Q1285.0,315 1285.0,322 Q1285.0,315 1292.0,315 L1469,315 Q1476,315 1476,308" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="1285.0" y="341.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#5b6475" text-anchor="middle" >op 4</text>
+<circle cx="74" cy="372" r="14" fill="#1d2330"/>
+<text x="74" y="377.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" >2</text>
+<text x="98" y="379.7" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="bold" fill="#1d2330" text-anchor="start" >Code</text>
+<text x="330" y="378" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" font-style="italic">Literals and lengths share one Huffman alphabet; distances have their own. There are no repeat offsets.</text>
+<text x="60" y="413" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="bold" fill="#b88a00" text-anchor="start" >Literal/length</text>
+<text x="60" y="431" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="normal" fill="#5b6475" text-anchor="start" >bytes 0–255, lengths 257–285</text>
+<rect x="330" y="392" width="1200" height="46" rx="8" fill="#fdf0c4" fill-opacity=".4" stroke="#b88a00" stroke-opacity=".55" stroke-width="1.2"/>
+<text x="1508" y="421.3" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="normal" fill="#5b6475" text-anchor="middle" >…</text>
+<text x="60" y="467" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="bold" fill="#2a6fb8" text-anchor="start" >Distance</text>
+<text x="60" y="485" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="normal" fill="#5b6475" text-anchor="start" >distance codes 0–29</text>
+<rect x="330" y="446" width="1200" height="46" rx="8" fill="#dbe9f7" fill-opacity=".4" stroke="#2a6fb8" stroke-opacity=".55" stroke-width="1.2"/>
+<text x="1508" y="475.3" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="normal" fill="#5b6475" text-anchor="middle" >…</text>
+<text x="60" y="521" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="bold" fill="#1f8a7a" text-anchor="start" >Extra bits</text>
+<text x="60" y="539" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="normal" fill="#5b6475" text-anchor="start" >raw, after a length/distance</text>
+<rect x="330" y="500" width="1200" height="46" rx="8" fill="#d4efe9" fill-opacity=".4" stroke="#1f8a7a" stroke-opacity=".55" stroke-width="1.2"/>
+<text x="1508" y="529.3" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="normal" fill="#5b6475" text-anchor="middle" >…</text>
+<text x="60" y="637" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="bold" fill="#56637d" text-anchor="start" >Bitstream</text>
+<text x="60" y="655" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13.5" font-weight="normal" fill="#5b6475" text-anchor="start" >what the block stores</text>
+<rect x="330" y="616" width="1200" height="46" rx="8" fill="#e4e9f1" fill-opacity=".4" stroke="#56637d" stroke-opacity=".55" stroke-width="1.2"/>
+<text x="1508" y="645.3" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="normal" fill="#5b6475" text-anchor="middle" >…</text>
+<rect x="362" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="375.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >l</text>
+<rect x="392" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="405.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >o</text>
+<rect x="422" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="435.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >r</text>
+<rect x="452" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="465.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >e</text>
+<rect x="482" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="495.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >m</text>
+<rect x="662" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="675.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >i</text>
+<rect x="692" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="705.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >p</text>
+<rect x="1092" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1105.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >s</text>
+<rect x="1122" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1135.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >u</text>
+<rect x="1152" y="400" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1165.0" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >m</text>
+<rect x="529.8" y="400" width="44" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="551.8" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >258</text>
+<text x="581.8" y="419.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >length 4</text>
+<rect x="754.8" y="400" width="44" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="776.8" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >260</text>
+<text x="806.8" y="419.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >length 6</text>
+<rect x="939.8" y="400" width="44" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="961.8" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >262</text>
+<text x="991.8" y="419.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >length 8</text>
+<rect x="1263.85" y="400" width="44" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1285.85" y="420.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >273</text>
+<text x="1315.85" y="419.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >35 + 3 bits</text>
+<rect x="518.85" y="454" width="44" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="540.85" y="474.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >8</text>
+<text x="570.85" y="473.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >17 + 3 bits</text>
+<rect x="743.85" y="454" width="44" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="765.85" y="474.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >8</text>
+<text x="795.85" y="473.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >17 + 3 bits</text>
+<rect x="958.05" y="454" width="44" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="980.05" y="474.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >2</text>
+<text x="1010.05" y="473.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >= 3</text>
+<rect x="1260.2" y="454" width="44" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="1282.2" y="474.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >19</text>
+<text x="1312.2" y="473.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >769 + 8 bits</text>
+<rect x="558.0" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="567.0" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="576.0" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="585.0" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="594.0" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="603.0" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="783.0" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="792.0" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="801.0" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="810.0" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="819.0" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="828.0" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1185.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1194.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1203.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1212.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="1221.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1230.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1249.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1258.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1267.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1276.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1285.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1294.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1303.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1312.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="1321.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1330.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="1339.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1348.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1357.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1366.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1375.5" y="508" width="18" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1.1" />
+<text x="1384.5" y="528.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<text x="1401.5" y="527.55" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="13" font-weight="normal" fill="#5b6475" text-anchor="start" >len · dist</text>
+<rect x="790" y="570" width="280" height="28" fill="#ffffff"/>
+<text x="930" y="589.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="middle" font-style="italic">↓   interleaved in parse order   ↓</text>
+<rect x="362" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="375.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >l</text>
+<rect x="392" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="405.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >o</text>
+<rect x="422" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="435.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >r</text>
+<rect x="452" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="465.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >e</text>
+<rect x="482" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="495.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >m</text>
+<rect x="662" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="675.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >i</text>
+<rect x="692" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="705.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >p</text>
+<rect x="1092" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1105.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >s</text>
+<rect x="1122" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1135.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >u</text>
+<rect x="1152" y="624" width="26" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1165.0" y="644.95" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="17" font-weight="bold" fill="#1d2330" text-anchor="middle" >m</text>
+<rect x="531.5" y="624" width="39" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="551.0" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >258</text>
+<rect x="573.5" y="624" width="26" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="586.5" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >8</text>
+<rect x="602.5" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="608.5" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="614.5" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="620.5" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="626.5" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="632.5" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="756.5" y="624" width="39" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="776.0" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >260</text>
+<rect x="798.5" y="624" width="26" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="811.5" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >8</text>
+<rect x="827.5" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="833.5" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="839.5" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="845.5" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="851.5" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="857.5" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="961.0" y="624" width="39" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="980.5" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >262</text>
+<rect x="1003.0" y="624" width="26" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="1016.0" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >2</text>
+<rect x="1225.0" y="624" width="39" height="30" rx="4" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1244.5" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >273</text>
+<rect x="1267.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1273.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1279.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1285.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="1291.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1297.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1306.0" y="624" width="30" height="30" rx="4" fill="#dbe9f7" stroke="#2a6fb8" stroke-width="1.4" />
+<text x="1321.0" y="643.9" font-family="Consolas, 'SF Mono', Menlo, 'DejaVu Sans Mono', monospace" font-size="14" font-weight="bold" fill="#1d2330" text-anchor="middle" >19</text>
+<rect x="1339.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1345.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1351.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1357.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1363.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1369.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1375.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1381.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="1387.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1393.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >0</text>
+<rect x="1399.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1405.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1411.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1417.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<rect x="1423.0" y="624" width="12" height="30" rx="2" fill="#d4efe9" stroke="#1f8a7a" stroke-width="1" />
+<text x="1429.0" y="643.2" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12" font-weight="bold" fill="#1d2330" text-anchor="middle" >1</text>
+<path d="M1542,394 Q1552,394 1552,404 L1552,459.0 Q1552,469.0 1562,469.0 Q1552,469.0 1552,479.0 L1552,534 Q1552,544 1542,544" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="1574" y="430" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="19" font-weight="bold" fill="#1d2330" text-anchor="start" >per block</text>
+<text x="1574" y="456" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >2 Huffman tables, ≤ 15-bit codes:</text>
+<text x="1574" y="477" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >286 literal/length symbols</text>
+<text x="1574" y="498" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >and 30 distance symbols</text>
+<text x="1574" y="526" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >extra bits are raw</text>
+<path d="M1542,618 Q1550,618 1550,626 L1550,631.0 Q1550,639.0 1558,639.0 Q1550,639.0 1550,647.0 L1550,652 Q1550,660 1542,660" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="1574" y="634" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="19" font-weight="bold" fill="#1d2330" text-anchor="start" >one bitstream</text>
+<text x="1574" y="656" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >LSB first, symbol by symbol;</text>
+<text x="1574" y="677" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >where a symbol starts is known</text>
+<text x="1574" y="698" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >only after decoding the one before</text>
+<circle cx="74" cy="802" r="14" fill="#1d2330"/>
+<text x="74" y="807.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" >3</text>
+<text x="98" y="809.7" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="bold" fill="#1d2330" text-anchor="start" >Serialize</text>
+<text x="60" y="846" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >stream of blocks</text>
+<text x="60" y="866" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" >one bitstream</text>
+<rect x="331" y="826" width="98" height="54" rx="3" fill="#f3f5f8" stroke="#a3abba" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="380.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="middle" >zlib / gzip</text>
+<text x="380.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >header</text>
+<rect x="431" y="826" width="88" height="54" rx="3" fill="#dfe4ec" stroke="#56637d" stroke-width="1.4" />
+<text x="475.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >header</text>
+<text x="475.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >3 bits</text>
+<rect x="521" y="826" width="128" height="54" rx="3" fill="#dfe4ec" stroke="#56637d" stroke-width="1.4" />
+<text x="585.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >counts</text>
+<text x="585.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >14 bits</text>
+<rect x="651" y="826" width="148" height="54" rx="3" fill="#dfe4ec" stroke="#56637d" stroke-width="1.4" />
+<text x="725.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >CL lengths</text>
+<text x="725.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >4–19 × 3 bits</text>
+<rect x="801" y="826" width="208" height="54" rx="3" fill="#dfe4ec" stroke="#56637d" stroke-width="1.4" />
+<text x="905.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >code lengths</text>
+<text x="905.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >Huffman + RLE</text>
+<rect x="1011" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1018" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1025" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1032" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1041" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1050" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1056" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1063" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1072" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1081" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1087" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1096" y="826" width="7" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1103" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1110" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1117" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1124" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1133" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1142" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1148" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1155" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1164" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1173" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1179" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1188" y="826" width="7" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1195" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1202" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1209" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1216" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1225" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1234" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1240" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1247" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1256" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1265" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1271" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1280" y="826" width="7" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1287" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1294" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1301" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1308" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1317" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1326" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1332" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1339" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1348" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1357" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1363" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1372" y="826" width="7" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1379" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1386" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1393" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1400" y="826" width="9" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1409" y="826" width="9" height="54" fill="#2a6fb8" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1418" y="826" width="6" height="54" fill="#1f8a7a" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1424" y="826" width="7" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1431" y="826" width="8" height="54" fill="#b88a00" fill-opacity=".45" stroke="#ffffff" stroke-width="1"/>
+<rect x="1011" y="826" width="428" height="54" fill="none" stroke="#1d2330" stroke-width="1.6"/>
+<rect x="1130.0" y="840.0" width="190.0" height="26" rx="13" fill="#ffffff" fill-opacity=".92"/>
+<text x="1225.0" y="858.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >symbols + extra bits</text>
+<rect x="1441" y="826" width="68" height="54" rx="3" fill="#fdf0c4" stroke="#b88a00" stroke-width="1.4" />
+<text x="1475.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2330" text-anchor="middle" >256</text>
+<text x="1475.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >end</text>
+<rect x="1511" y="826" width="218" height="54" rx="3" fill="#f3f5f8" stroke="#a3abba" stroke-width="1.4" />
+<text x="1620.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="middle" >block 2</text>
+<text x="1620.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >starts at any bit</text>
+<rect x="1731" y="826" width="118" height="54" rx="3" fill="#f3f5f8" stroke="#a3abba" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="1790.0" y="849.25" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="middle" >Adler-32 /</text>
+<text x="1790.0" y="869.375" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#5b6475" text-anchor="middle" >CRC-32</text>
+<path d="M432,820 Q432,812 440,812 L962.0,812 Q970.0,812 970.0,804 Q970.0,812 978.0,812 L1500,812 Q1508,812 1508,820" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="970.0" y="793.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >block 1 · bit-packed, not byte aligned</text>
+<path d="M332,888 Q332,897 341,897 L371.0,897 Q380.0,897 380.0,906 Q380.0,897 389.0,897 L419,897 Q428,897 428,888" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="380.0" y="935.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >wrapper</text>
+<text x="380.0" y="958.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >optional</text>
+<path d="M432,888 Q432,897 441,897 L711.0,897 Q720.0,897 720.0,906 Q720.0,897 729.0,897 L999,897 Q1008,897 1008,888" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="720.0" y="935.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >block header + Huffman tables</text>
+<text x="720.0" y="958.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >BFINAL, BTYPE (stored, fixed, dynamic),</text>
+<text x="720.0" y="978.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >HLIT, HDIST, HCLEN, then code lengths</text>
+<text x="720.0" y="998.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >coded with a code-length Huffman code</text>
+<path d="M1012,888 Q1012,897 1021,897 L1251.0,897 Q1260.0,897 1260.0,906 Q1260.0,897 1269.0,897 L1499,897 Q1508,897 1508,888" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="1260.0" y="935.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >block data</text>
+<text x="1260.0" y="958.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >length code, extra bits,</text>
+<text x="1260.0" y="978.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >distance code, extra bits, …</text>
+<text x="1260.0" y="998.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >until end-of-block 256</text>
+<path d="M1732,888 Q1732,897 1741,897 L1781.0,897 Q1790.0,897 1790.0,906 Q1790.0,897 1799.0,897 L1839,897 Q1848,897 1848,888" fill="none" stroke="#5b6475" stroke-width="1.4" />
+<text x="1790.0" y="935.6" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="bold" fill="#1d2330" text-anchor="middle" >wrapper</text>
+<text x="1790.0" y="958.9" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="normal" fill="#5b6475" text-anchor="middle" >optional</text>
+<text x="60" y="1050" font-family="Segoe UI, 'Helvetica Neue', Arial, sans-serif" font-size="15" font-weight="normal" fill="#5b6475" text-anchor="start" font-style="italic">Everything is one LSB-first bitstream: each symbol starts where the previous one ends, so the decoder works through it serially.</text>
+</svg>
